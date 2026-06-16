@@ -29,6 +29,14 @@ export default function Navigation() {
             Dashboard
           </Link>
           <Link
+            href="/schedule"
+            className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
+              pathname === '/schedule' ? 'bg-green-50 text-green-700' : 'text-gray-600 hover:text-gray-900'
+            }`}
+          >
+            Schedule
+          </Link>
+          <Link
             href="/identify"
             className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
               pathname === '/identify' ? 'bg-green-50 text-green-700' : 'text-gray-600 hover:text-gray-900'
