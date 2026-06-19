@@ -1,9 +1,11 @@
 import Link from 'next/link';
 import { UserPlant } from '@/types';
+import { Card, CardContent } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
 
-function getWateringStatus(plant: UserPlant): { label: string; color: string; urgent: boolean } {
+function getWateringStatus(plant: UserPlant): { label: string; color: string } {
   if (!plant.next_watering_at) {
-    return { label: 'Set up watering', color: 'text-gray-400', urgent: false };
+    return { label: 'Set up watering', color: 'text-muted-foreground' };
   }
 
   const now = new Date();
@@ -12,13 +14,13 @@ function getWateringStatus(plant: UserPlant): { label: string; color: string; ur
   const diffDays = Math.ceil(diffMs / (1000 * 60 * 60 * 24));
 
   if (diffDays < 0) {
-    return { label: `${Math.abs(diffDays)}d overdue`, color: 'text-red-600', urgent: true };
+    return { label: `${Math.abs(diffDays)}d overdue`, color: 'text-red-600' };
   } else if (diffDays === 0) {
-    return { label: 'Water today!', color: 'text-orange-500', urgent: true };
+    return { label: 'Water today!', color: 'text-orange-500' };
   } else if (diffDays <= 2) {
-    return { label: `Water in ${diffDays}d`, color: 'text-yellow-600', urgent: false };
+    return { label: `Water in ${diffDays}d`, color: 'text-yellow-600' };
   } else {
-    return { label: `Water in ${diffDays}d`, color: 'text-green-600', urgent: false };
+    return { label: `Water in ${diffDays}d`, color: 'text-green-600' };
   }
 }
 
@@ -33,9 +35,9 @@ export default function PlantCard({ plant }: { plant: UserPlant }) {
 
   return (
     <Link href={`/plants/${plant.id}`} className="block">
-      <div className="bg-white rounded-2xl border border-gray-100 hover:border-green-200 hover:shadow-md transition-all p-4">
-        <div className="flex gap-4">
-          <div className="w-20 h-20 rounded-xl overflow-hidden bg-green-50 flex items-center justify-center flex-shrink-0">
+      <Card className="hover:shadow-md hover:ring-primary/20 transition-all">
+        <CardContent className="flex gap-4">
+          <div className="w-20 h-20 rounded-xl overflow-hidden bg-accent flex items-center justify-center flex-shrink-0">
             {plant.photo_url ? (
               <img src={plant.photo_url} alt={plant.common_name} className="w-full h-full object-cover" />
             ) : (
@@ -45,20 +47,20 @@ export default function PlantCard({ plant }: { plant: UserPlant }) {
           <div className="flex-1 min-w-0">
             <div className="flex items-start justify-between gap-2">
               <div>
-                <h3 className="font-semibold text-gray-900 truncate">
+                <h3 className="font-semibold text-foreground truncate">
                   {plant.nickname || plant.common_name}
                 </h3>
                 {plant.nickname && (
-                  <p className="text-xs text-gray-400 truncate">{plant.common_name}</p>
+                  <p className="text-xs text-muted-foreground truncate">{plant.common_name}</p>
                 )}
                 {plant.scientific_name && !plant.nickname && (
-                  <p className="text-xs text-gray-400 truncate italic">{plant.scientific_name}</p>
+                  <p className="text-xs text-muted-foreground truncate italic">{plant.scientific_name}</p>
                 )}
               </div>
               {plant.difficulty && (
-                <span className={`text-xs px-2 py-0.5 rounded-full font-medium flex-shrink-0 ${difficultyBadge[plant.difficulty] || ''}`}>
+                <Badge className={`${difficultyBadge[plant.difficulty] || ''} flex-shrink-0`}>
                   {plant.difficulty}
-                </span>
+                </Badge>
               )}
             </div>
             <div className="mt-2 flex items-center gap-3">
@@ -69,15 +71,15 @@ export default function PlantCard({ plant }: { plant: UserPlant }) {
                 </span>
               </div>
               {plant.location && (
-                <span className="text-xs text-gray-400 flex items-center gap-1">
+                <span className="text-xs text-muted-foreground flex items-center gap-1">
                   <span>📍</span>
                   {plant.location}
                 </span>
               )}
             </div>
           </div>
-        </div>
-      </div>
+        </CardContent>
+      </Card>
     </Link>
   );
 }
