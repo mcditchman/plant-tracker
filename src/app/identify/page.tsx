@@ -23,14 +23,24 @@ export default function IdentifyPage() {
   const [error, setError] = useState('');
   const [nickname, setNickname] = useState('');
   const [location, setLocation] = useState('');
+  const [geoCoords, setGeoCoords] = useState<{ lat: number; lng: number } | null>(null);
   const fileRef = useRef<HTMLInputElement>(null);
   const router = useRouter();
+
+  function requestGeolocation() {
+    if (!navigator.geolocation) return;
+    navigator.geolocation.getCurrentPosition(
+      (pos) => setGeoCoords({ lat: pos.coords.latitude, lng: pos.coords.longitude }),
+      () => { /* silently ignore if denied */ }
+    );
+  }
 
   function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
     if (!file) return;
 
     setImageType('image/jpeg');
+    requestGeolocation();
     const reader = new FileReader();
     reader.onload = (ev) => {
       const img = new Image();
@@ -56,8 +66,8 @@ export default function IdentifyPage() {
 
     try {
       const body = mode === 'photo'
-        ? { imageBase64, imageType }
-        : { searchText };
+        ? { imageBase64, imageType, geoCoords }
+        : { searchText, geoCoords };
 
       const res = await fetch('/api/identify', {
         method: 'POST',
@@ -173,7 +183,7 @@ export default function IdentifyPage() {
               <input
                 type="text"
                 value={searchText}
-                onChange={e => setSearchText(e.target.value)}
+                onChange={e => { setSearchText(e.target.value); if (e.target.value.length === 1) requestGeolocation(); }}
                 onKeyDown={e => e.key === 'Enter' && searchText.trim() && handleIdentify()}
                 placeholder="e.g. 'monstera', 'snake plant', 'that spiky cactus'"
                 className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-green-400 focus:ring-2 focus:ring-green-100"
