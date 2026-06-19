@@ -5,6 +5,9 @@ import { UserPlant, CareLog } from '@/types';
 import WaterButton from '@/components/WaterButton';
 import CareLogButton from '@/components/CareLogButton';
 import DeletePlantButton from '@/components/DeletePlantButton';
+import { Card, CardContent } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { Separator } from '@/components/ui/separator';
 
 function formatDate(dateStr: string | null): string {
   if (!dateStr) return 'Never';
@@ -19,7 +22,7 @@ function formatDate(dateStr: string | null): string {
 }
 
 function getWateringStatus(plant: UserPlant) {
-  if (!plant.next_watering_at) return { label: 'Not scheduled', color: 'text-gray-400', bg: 'bg-gray-50' };
+  if (!plant.next_watering_at) return { label: 'Not scheduled', color: 'text-muted-foreground', bg: 'bg-muted' };
   const now = new Date();
   const next = new Date(plant.next_watering_at);
   const diffMs = next.getTime() - now.getTime();
@@ -41,9 +44,9 @@ const careTypeLabels: Record<string, { label: string; icon: string }> = {
 };
 
 const difficultyInfo = {
-  easy: { label: 'Easy', color: 'text-green-600 bg-green-50', desc: 'Great for beginners' },
-  moderate: { label: 'Moderate', color: 'text-yellow-600 bg-yellow-50', desc: 'Some attention needed' },
-  hard: { label: 'Advanced', color: 'text-red-600 bg-red-50', desc: 'Needs regular care' },
+  easy: { label: 'Easy', className: 'bg-green-100 text-green-700' },
+  moderate: { label: 'Moderate', className: 'bg-yellow-100 text-yellow-700' },
+  hard: { label: 'Advanced', className: 'bg-red-100 text-red-700' },
 };
 
 export default async function PlantDetailPage({ params }: { params: Promise<{ id: string }> }) {
@@ -67,52 +70,52 @@ export default async function PlantDetailPage({ params }: { params: Promise<{ id
   return (
     <div className="space-y-4">
       <div className="flex items-center gap-3 mb-2">
-        <Link href="/" className="text-gray-400 hover:text-gray-600 transition-colors">← Back</Link>
+        <Link href="/" className="text-muted-foreground hover:text-foreground transition-colors">← Back</Link>
       </div>
 
       {/* Hero card */}
-      <div className="bg-white rounded-2xl border border-gray-100 overflow-hidden">
+      <Card>
         {plant.photo_url && (
           <img src={plant.photo_url} alt={plant.common_name} className="w-full h-52 object-cover" />
         )}
-        <div className="p-5">
+        <CardContent>
           <div className="flex items-start justify-between">
             <div>
-              <h1 className="text-2xl font-bold text-gray-900">
+              <h1 className="text-2xl font-bold text-foreground">
                 {plant.nickname || plant.common_name}
               </h1>
-              {plant.nickname && <p className="text-gray-500 text-sm">{plant.common_name}</p>}
+              {plant.nickname && <p className="text-muted-foreground text-sm">{plant.common_name}</p>}
               {plant.scientific_name && (
-                <p className="text-gray-400 text-sm italic">{plant.scientific_name}</p>
+                <p className="text-muted-foreground text-sm italic">{plant.scientific_name}</p>
               )}
             </div>
             {diff && (
-              <span className={`text-xs px-2.5 py-1 rounded-full font-medium ${diff.color}`}>
-                {diff.label}
-              </span>
+              <Badge className={diff.className}>{diff.label}</Badge>
             )}
           </div>
           {plant.location && (
-            <p className="text-sm text-gray-500 mt-2 flex items-center gap-1">
+            <p className="text-sm text-muted-foreground mt-2 flex items-center gap-1">
               <span>📍</span> {plant.location}
             </p>
           )}
           {plant.description && (
-            <p className="text-sm text-gray-600 mt-3 leading-relaxed">{plant.description}</p>
+            <p className="text-sm text-foreground/80 mt-3 leading-relaxed">{plant.description}</p>
           )}
-        </div>
-      </div>
+        </CardContent>
+      </Card>
 
       {/* Watering status */}
-      <div className={`${waterStatus.bg} rounded-2xl p-4 flex items-center justify-between`}>
-        <div>
-          <p className={`font-semibold ${waterStatus.color}`}>💧 {waterStatus.label}</p>
-          <p className="text-xs text-gray-500 mt-0.5">
-            Last watered: {formatDate(plant.last_watered_at)} · Every {plant.watering_frequency_days} days
-          </p>
-        </div>
-        <WaterButton plantId={plant.id} />
-      </div>
+      <Card className={waterStatus.bg}>
+        <CardContent className="flex items-center justify-between">
+          <div>
+            <p className={`font-semibold ${waterStatus.color}`}>💧 {waterStatus.label}</p>
+            <p className="text-xs text-muted-foreground mt-0.5">
+              Last watered: {formatDate(plant.last_watered_at)} · Every {plant.watering_frequency_days} days
+            </p>
+          </div>
+          <WaterButton plantId={plant.id} />
+        </CardContent>
+      </Card>
 
       {/* Care actions */}
       <div className="flex gap-3">
@@ -120,104 +123,113 @@ export default async function PlantDetailPage({ params }: { params: Promise<{ id
       </div>
 
       {/* Care requirements */}
-      <div className="bg-white rounded-2xl border border-gray-100 p-5">
-        <h2 className="font-semibold text-gray-900 mb-4">Care Guide</h2>
-        <div className="space-y-3">
-          {plant.care_water && (
-            <div className="flex gap-3">
-              <span className="text-xl w-7 flex-shrink-0">💧</span>
-              <div>
-                <p className="text-xs font-medium text-gray-400 uppercase tracking-wide mb-0.5">Water</p>
-                <p className="text-sm text-gray-700">{plant.care_water}</p>
+      <Card>
+        <CardContent>
+          <h2 className="font-semibold text-foreground mb-4">Care Guide</h2>
+          <div className="space-y-3">
+            {plant.care_water && (
+              <div className="flex gap-3">
+                <span className="text-xl w-7 flex-shrink-0">💧</span>
+                <div>
+                  <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-0.5">Water</p>
+                  <p className="text-sm text-foreground/80">{plant.care_water}</p>
+                </div>
               </div>
-            </div>
-          )}
-          {plant.care_light && (
-            <div className="flex gap-3">
-              <span className="text-xl w-7 flex-shrink-0">☀️</span>
-              <div>
-                <p className="text-xs font-medium text-gray-400 uppercase tracking-wide mb-0.5">Light</p>
-                <p className="text-sm text-gray-700">{plant.care_light}</p>
+            )}
+            {plant.care_light && (
+              <div className="flex gap-3">
+                <span className="text-xl w-7 flex-shrink-0">☀️</span>
+                <div>
+                  <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-0.5">Light</p>
+                  <p className="text-sm text-foreground/80">{plant.care_light}</p>
+                </div>
               </div>
-            </div>
-          )}
-          {plant.care_humidity && (
-            <div className="flex gap-3">
-              <span className="text-xl w-7 flex-shrink-0">🌫️</span>
-              <div>
-                <p className="text-xs font-medium text-gray-400 uppercase tracking-wide mb-0.5">Humidity</p>
-                <p className="text-sm text-gray-700">{plant.care_humidity}</p>
+            )}
+            {plant.care_humidity && (
+              <div className="flex gap-3">
+                <span className="text-xl w-7 flex-shrink-0">🌫️</span>
+                <div>
+                  <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-0.5">Humidity</p>
+                  <p className="text-sm text-foreground/80">{plant.care_humidity}</p>
+                </div>
               </div>
-            </div>
-          )}
-          {plant.care_temperature && (
-            <div className="flex gap-3">
-              <span className="text-xl w-7 flex-shrink-0">🌡️</span>
-              <div>
-                <p className="text-xs font-medium text-gray-400 uppercase tracking-wide mb-0.5">Temperature</p>
-                <p className="text-sm text-gray-700">{plant.care_temperature}</p>
+            )}
+            {plant.care_temperature && (
+              <div className="flex gap-3">
+                <span className="text-xl w-7 flex-shrink-0">🌡️</span>
+                <div>
+                  <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-0.5">Temperature</p>
+                  <p className="text-sm text-foreground/80">{plant.care_temperature}</p>
+                </div>
               </div>
-            </div>
-          )}
-          {plant.care_soil && (
-            <div className="flex gap-3">
-              <span className="text-xl w-7 flex-shrink-0">🪱</span>
-              <div>
-                <p className="text-xs font-medium text-gray-400 uppercase tracking-wide mb-0.5">Soil</p>
-                <p className="text-sm text-gray-700">{plant.care_soil}</p>
+            )}
+            {plant.care_soil && (
+              <div className="flex gap-3">
+                <span className="text-xl w-7 flex-shrink-0">🪱</span>
+                <div>
+                  <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-0.5">Soil</p>
+                  <p className="text-sm text-foreground/80">{plant.care_soil}</p>
+                </div>
               </div>
-            </div>
-          )}
-          {plant.care_fertilizer && (
-            <div className="flex gap-3">
-              <span className="text-xl w-7 flex-shrink-0">🌱</span>
-              <div>
-                <p className="text-xs font-medium text-gray-400 uppercase tracking-wide mb-0.5">Fertilizer</p>
-                <p className="text-sm text-gray-700">{plant.care_fertilizer}</p>
+            )}
+            {plant.care_fertilizer && (
+              <div className="flex gap-3">
+                <span className="text-xl w-7 flex-shrink-0">🌱</span>
+                <div>
+                  <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-0.5">Fertilizer</p>
+                  <p className="text-sm text-foreground/80">{plant.care_fertilizer}</p>
+                </div>
               </div>
-            </div>
-          )}
-        </div>
-      </div>
+            )}
+          </div>
+        </CardContent>
+      </Card>
 
       {/* Tips */}
       {plant.care_tips && plant.care_tips.length > 0 && (
-        <div className="bg-green-50 rounded-2xl border border-green-100 p-5">
-          <h2 className="font-semibold text-gray-900 mb-3">💡 Care Tips</h2>
-          <ul className="space-y-2">
-            {plant.care_tips.map((tip, i) => (
-              <li key={i} className="text-sm text-gray-700 flex gap-2">
-                <span className="text-green-500 flex-shrink-0 mt-0.5">•</span>
-                {tip}
-              </li>
-            ))}
-          </ul>
-        </div>
+        <Card className="bg-accent">
+          <CardContent>
+            <h2 className="font-semibold text-foreground mb-3">💡 Care Tips</h2>
+            <ul className="space-y-2">
+              {plant.care_tips.map((tip, i) => (
+                <li key={i} className="text-sm text-foreground/80 flex gap-2">
+                  <span className="text-primary flex-shrink-0 mt-0.5">•</span>
+                  {tip}
+                </li>
+              ))}
+            </ul>
+          </CardContent>
+        </Card>
       )}
 
       {/* Care history */}
-      <div className="bg-white rounded-2xl border border-gray-100 p-5">
-        <h2 className="font-semibold text-gray-900 mb-4">Care History</h2>
-        {logs.length === 0 ? (
-          <p className="text-gray-400 text-sm">No care activities logged yet. Start by watering your plant!</p>
-        ) : (
-          <div className="space-y-3">
-            {logs.map(log => {
-              const info = careTypeLabels[log.care_type] || { label: log.care_type, icon: '📝' };
-              return (
-                <div key={log.id} className="flex items-center gap-3">
-                  <span className="text-lg">{info.icon}</span>
-                  <div className="flex-1">
-                    <p className="text-sm font-medium text-gray-800">{info.label}</p>
-                    {log.notes && <p className="text-xs text-gray-500">{log.notes}</p>}
+      <Card>
+        <CardContent>
+          <h2 className="font-semibold text-foreground mb-4">Care History</h2>
+          {logs.length === 0 ? (
+            <p className="text-muted-foreground text-sm">No care activities logged yet. Start by watering your plant!</p>
+          ) : (
+            <div className="space-y-3">
+              {logs.map((log, i) => {
+                const info = careTypeLabels[log.care_type] || { label: log.care_type, icon: '📝' };
+                return (
+                  <div key={log.id}>
+                    <div className="flex items-center gap-3">
+                      <span className="text-lg">{info.icon}</span>
+                      <div className="flex-1">
+                        <p className="text-sm font-medium text-foreground">{info.label}</p>
+                        {log.notes && <p className="text-xs text-muted-foreground">{log.notes}</p>}
+                      </div>
+                      <p className="text-xs text-muted-foreground">{formatDate(log.performed_at)}</p>
+                    </div>
+                    {i < logs.length - 1 && <Separator className="mt-3" />}
                   </div>
-                  <p className="text-xs text-gray-400">{formatDate(log.performed_at)}</p>
-                </div>
-              );
-            })}
-          </div>
-        )}
-      </div>
+                );
+              })}
+            </div>
+          )}
+        </CardContent>
+      </Card>
 
       {/* Danger zone */}
       <div className="pb-4">

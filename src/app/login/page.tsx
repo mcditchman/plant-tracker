@@ -1,6 +1,11 @@
 'use client';
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { Card, CardContent } from '@/components/ui/card';
+import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Button } from '@/components/ui/button';
 
 export default function LoginPage() {
   const [mode, setMode] = useState<'login' | 'signup'>('login');
@@ -47,71 +52,61 @@ export default function LoginPage() {
       <div className="w-full max-w-sm">
         <div className="text-center mb-8">
           <div className="text-6xl mb-3">🌿</div>
-          <h1 className="text-2xl font-bold text-gray-900">Plant Tracker</h1>
-          <p className="text-gray-500 mt-1">Care for your plants, one at a time</p>
+          <h1 className="text-2xl font-bold text-foreground">Plant Tracker</h1>
+          <p className="text-muted-foreground mt-1">Care for your plants, one at a time</p>
         </div>
 
-        <div className="bg-white rounded-2xl border border-gray-100 p-6">
-          <div className="flex bg-gray-100 rounded-xl p-1 mb-6">
-            <button
-              onClick={() => setMode('login')}
-              className={`flex-1 py-2 rounded-lg text-sm font-medium transition-all ${mode === 'login' ? 'bg-white shadow-sm text-gray-900' : 'text-gray-500'}`}
-            >
-              Log In
-            </button>
-            <button
-              onClick={() => setMode('signup')}
-              className={`flex-1 py-2 rounded-lg text-sm font-medium transition-all ${mode === 'signup' ? 'bg-white shadow-sm text-gray-900' : 'text-gray-500'}`}
-            >
-              Sign Up
-            </button>
-          </div>
+        <Card>
+          <CardContent>
+            <Tabs value={mode} onValueChange={v => setMode(v as 'login' | 'signup')} className="mb-6">
+              <TabsList className="w-full">
+                <TabsTrigger value="login" className="flex-1">Log In</TabsTrigger>
+                <TabsTrigger value="signup" className="flex-1">Sign Up</TabsTrigger>
+              </TabsList>
+            </Tabs>
 
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
-              <input
-                type="email"
-                value={email}
-                onChange={e => setEmail(e.target.value)}
-                required
-                className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-green-400 focus:ring-2 focus:ring-green-100"
-                placeholder="you@example.com"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Password</label>
-              <input
-                type="password"
-                value={password}
-                onChange={e => setPassword(e.target.value)}
-                required
-                minLength={6}
-                className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-green-400 focus:ring-2 focus:ring-green-100"
-                placeholder="••••••••"
-              />
-            </div>
-
-            {error && (
-              <div className="bg-red-50 text-red-600 text-sm px-4 py-3 rounded-xl">
-                {error}
+            <form onSubmit={handleSubmit} className="space-y-4">
+              <div className="space-y-1">
+                <Label htmlFor="email">Email</Label>
+                <Input
+                  id="email"
+                  type="email"
+                  value={email}
+                  onChange={e => setEmail(e.target.value)}
+                  required
+                  placeholder="you@example.com"
+                />
               </div>
-            )}
-            {message && (
-              <div className="bg-green-50 text-green-700 text-sm px-4 py-3 rounded-xl">
-                {message}
+              <div className="space-y-1">
+                <Label htmlFor="password">Password</Label>
+                <Input
+                  id="password"
+                  type="password"
+                  value={password}
+                  onChange={e => setPassword(e.target.value)}
+                  required
+                  minLength={6}
+                  placeholder="••••••••"
+                />
               </div>
-            )}
 
-            <button
-              type="submit"
-              disabled={loading}
-              className="w-full bg-green-500 hover:bg-green-600 disabled:bg-green-300 text-white font-medium py-3 rounded-xl transition-colors"
-            >
-              {loading ? '...' : mode === 'login' ? 'Log In' : 'Create Account'}
-            </button>
-          </form>
-        </div>
+              {error && (
+                <div className="bg-destructive/10 text-destructive text-sm px-4 py-3 rounded-xl">
+                  {error}
+                </div>
+              )}
+              {message && (
+                <div className="bg-accent text-accent-foreground text-sm px-4 py-3 rounded-xl">
+                  {message}
+                </div>
+              )}
+
+              <Button type="submit" disabled={loading} className="w-full">
+                {loading ? '...' : mode === 'login' ? 'Log In' : 'Create Account'}
+              </Button>
+            </form>
+          </CardContent>
+        </Card>
       </div>
     </div>
   );

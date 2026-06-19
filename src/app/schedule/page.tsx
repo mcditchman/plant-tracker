@@ -2,6 +2,8 @@ import { createClient } from '@/lib/supabase/server';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import { UserPlant } from '@/types';
+import { Card, CardContent } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
 
 type EventType = 'water' | 'fertilize';
 
@@ -45,7 +47,7 @@ const groupStyles: Record<string, { bg: string; text: string }> = {
   Today: { bg: 'bg-orange-50', text: 'text-orange-700' },
   Tomorrow: { bg: 'bg-yellow-50', text: 'text-yellow-700' },
   'This Week': { bg: 'bg-blue-50', text: 'text-blue-700' },
-  Later: { bg: 'bg-gray-50', text: 'text-gray-600' },
+  Later: { bg: 'bg-muted', text: 'text-muted-foreground' },
 };
 
 export default async function SchedulePage() {
@@ -82,33 +84,32 @@ export default async function SchedulePage() {
   return (
     <div>
       <div className="mb-6">
-        <h1 className="text-2xl font-bold text-gray-900">Schedule</h1>
-        <p className="text-gray-500 text-sm mt-0.5">
+        <h1 className="text-2xl font-bold text-foreground">Schedule</h1>
+        <p className="text-muted-foreground text-sm mt-0.5">
           {events.length === 0 ? 'No upcoming care' : 'Watering & maintenance, all plants'}
         </p>
       </div>
 
       {overdueCount > 0 && (
-        <div className="bg-red-50 border border-red-100 rounded-2xl p-4 mb-6">
-          <p className="text-red-700 font-medium text-sm">
-            ⚠️ {overdueCount} task{overdueCount !== 1 ? 's' : ''} overdue
-          </p>
-        </div>
+        <Card className="bg-red-50 mb-6">
+          <CardContent>
+            <p className="text-red-700 font-medium text-sm">
+              ⚠️ {overdueCount} task{overdueCount !== 1 ? 's' : ''} overdue
+            </p>
+          </CardContent>
+        </Card>
       )}
 
       {plantList.length === 0 ? (
         <div className="text-center py-16">
           <div className="text-6xl mb-4">📅</div>
-          <h2 className="text-xl font-semibold text-gray-800 mb-2">Nothing scheduled yet</h2>
-          <p className="text-gray-500 mb-6 max-w-xs mx-auto">
+          <h2 className="text-xl font-semibold text-foreground mb-2">Nothing scheduled yet</h2>
+          <p className="text-muted-foreground mb-6 max-w-xs mx-auto">
             Add a plant to start tracking watering and maintenance.
           </p>
-          <Link
-            href="/identify"
-            className="bg-green-500 hover:bg-green-600 text-white px-6 py-3 rounded-xl font-medium transition-colors inline-block"
-          >
+          <Button render={<Link href="/identify" />} nativeButton={false} size="lg">
             Identify a Plant
-          </Link>
+          </Button>
         </div>
       ) : (
         <div className="space-y-6">
@@ -135,26 +136,28 @@ export default async function SchedulePage() {
                           href={`/plants/${event.plant.id}`}
                           className="block"
                         >
-                          <div className={`${style.bg} rounded-xl p-3 flex items-center gap-3 hover:opacity-80 transition-opacity`}>
-                            <div className="w-10 h-10 rounded-lg overflow-hidden bg-white flex items-center justify-center flex-shrink-0">
-                              {event.plant.photo_url ? (
-                                <img src={event.plant.photo_url} alt={event.plant.common_name} className="w-full h-full object-cover" />
-                              ) : (
-                                <span className="text-xl">🌱</span>
-                              )}
-                            </div>
-                            <div className="flex-1 min-w-0">
-                              <p className="font-medium text-gray-900 text-sm truncate">
-                                {event.plant.nickname || event.plant.common_name}
-                              </p>
-                              <p className="text-xs text-gray-500 flex items-center gap-1">
-                                <span>{info.icon}</span> {info.label}
-                              </p>
-                            </div>
-                            <span className={`text-xs font-medium ${style.text} flex-shrink-0`}>
-                              {dayText}
-                            </span>
-                          </div>
+                          <Card className={`${style.bg} hover:opacity-80 transition-opacity`} size="sm">
+                            <CardContent className="flex items-center gap-3">
+                              <div className="w-10 h-10 rounded-lg overflow-hidden bg-card flex items-center justify-center flex-shrink-0">
+                                {event.plant.photo_url ? (
+                                  <img src={event.plant.photo_url} alt={event.plant.common_name} className="w-full h-full object-cover" />
+                                ) : (
+                                  <span className="text-xl">🌱</span>
+                                )}
+                              </div>
+                              <div className="flex-1 min-w-0">
+                                <p className="font-medium text-foreground text-sm truncate">
+                                  {event.plant.nickname || event.plant.common_name}
+                                </p>
+                                <p className="text-xs text-muted-foreground flex items-center gap-1">
+                                  <span>{info.icon}</span> {info.label}
+                                </p>
+                              </div>
+                              <span className={`text-xs font-medium ${style.text} flex-shrink-0`}>
+                                {dayText}
+                              </span>
+                            </CardContent>
+                          </Card>
                         </Link>
                       );
                     })}

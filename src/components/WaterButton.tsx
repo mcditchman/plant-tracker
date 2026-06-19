@@ -1,6 +1,7 @@
 'use client';
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { Button } from '@/components/ui/button';
 
 export default function WaterButton({ plantId }: { plantId: string }) {
   const [loading, setLoading] = useState(false);
@@ -17,13 +18,14 @@ export default function WaterButton({ plantId }: { plantId: string }) {
   }
 
   return (
-    <button
+    <Button
       onClick={handleWater}
       disabled={loading}
-      className="flex items-center gap-2 bg-blue-500 hover:bg-blue-600 disabled:bg-blue-300 text-white px-5 py-2.5 rounded-xl font-medium transition-colors"
+      size="lg"
+      className="gap-2 bg-blue-500 hover:bg-blue-600 disabled:bg-blue-300 text-white"
     >
       <span>{loading ? '⏳' : '💧'}</span>
       {loading ? 'Watering...' : 'Water Now'}
-    </button>
+    </Button>
   );
 }
