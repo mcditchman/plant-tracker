@@ -30,14 +30,22 @@ export default function IdentifyPage() {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    setImageType(file.type || 'image/jpeg');
+    setImageType('image/jpeg');
     const reader = new FileReader();
     reader.onload = (ev) => {
-      const dataUrl = ev.target?.result as string;
-      setImagePreview(dataUrl);
-      // Extract base64 part (after the comma)
-      const base64 = dataUrl.split(',')[1];
-      setImageBase64(base64);
+      const img = new Image();
+      img.onload = () => {
+        const MAX = 1024;
+        const scale = Math.min(1, MAX / Math.max(img.width, img.height));
+        const canvas = document.createElement('canvas');
+        canvas.width = Math.round(img.width * scale);
+        canvas.height = Math.round(img.height * scale);
+        canvas.getContext('2d')!.drawImage(img, 0, 0, canvas.width, canvas.height);
+        const dataUrl = canvas.toDataURL('image/jpeg', 0.85);
+        setImagePreview(dataUrl);
+        setImageBase64(dataUrl.split(',')[1]);
+      };
+      img.src = ev.target?.result as string;
     };
     reader.readAsDataURL(file);
   }
