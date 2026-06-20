@@ -45,12 +45,16 @@ async function fetchWikipediaPhoto(
     );
     if (!res.ok) return { photo_url: null, photo_attribution_url: null };
     const data: WikipediaSummary = await res.json();
-    if (!data.thumbnail?.source) return { photo_url: null, photo_attribution_url: null };
+    if (!data.thumbnail?.source?.startsWith('https://')) {
+      return { photo_url: null, photo_attribution_url: null };
+    }
+    const attributionUrl = data.content_urls?.desktop?.page;
     return {
       photo_url: data.thumbnail.source,
-      photo_attribution_url: data.content_urls?.desktop?.page || null,
+      photo_attribution_url: attributionUrl?.startsWith('https://') ? attributionUrl : null,
     };
-  } catch {
+  } catch (error) {
+    console.warn(`Wikipedia photo lookup failed for "${title}":`, error);
     return { photo_url: null, photo_attribution_url: null };
   }
 }
