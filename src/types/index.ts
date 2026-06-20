@@ -8,6 +8,7 @@ export interface UserPlant {
   scientific_name: string | null;
   nickname: string | null;
   photo_url: string | null;
+  photo_attribution_url: string | null;
   location: string | null;
   description: string | null;
   difficulty: Difficulty | null;
@@ -55,4 +56,13 @@ export interface PlantIdentification {
     fertilize_frequency_days: number;
   };
   tips: string[];
+}
+
+export interface PlantCandidate {
+  common_name: string;
+  scientific_name: string;
+  confidence: 'high' | 'medium' | 'low';
+  description: string;
+  photo_url: string | null;
+  photo_attribution_url: string | null;
 }
