@@ -34,6 +34,7 @@ export async function POST(request: NextRequest) {
       scientific_name: body.scientific_name,
       nickname: body.nickname,
       photo_url: body.photo_url,
+      photo_attribution_url: body.photo_attribution_url || null,
       location: body.location,
       description: body.description,
       difficulty: body.difficulty,
