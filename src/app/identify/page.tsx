@@ -1,7 +1,7 @@
 'use client';
 import { useState, useRef } from 'react';
 import { useRouter } from 'next/navigation';
-import { PlantIdentification } from '@/types';
+import { PlantIdentification, PlantCandidate } from '@/types';
 import { Card, CardContent } from '@/components/ui/card';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Input } from '@/components/ui/input';
@@ -9,13 +9,19 @@ import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 
-type Step = 'input' | 'loading' | 'result' | 'adding' | 'done';
+type Step = 'input' | 'loading' | 'candidates' | 'result' | 'adding' | 'done';
 type InputMode = 'photo' | 'search';
 
 const difficultyColors = {
   easy: 'bg-green-100 text-green-700',
   moderate: 'bg-yellow-100 text-yellow-700',
   hard: 'bg-red-100 text-red-700',
+};
+
+const confidenceColors = {
+  high: 'bg-green-100 text-green-700',
+  medium: 'bg-yellow-100 text-yellow-700',
+  low: 'bg-red-100 text-red-700',
 };
 
 export default function IdentifyPage() {
@@ -26,6 +32,9 @@ export default function IdentifyPage() {
   const [imageBase64, setImageBase64] = useState<string | null>(null);
   const [imageType, setImageType] = useState<string>('image/jpeg');
   const [result, setResult] = useState<PlantIdentification | null>(null);
+  const [candidates, setCandidates] = useState<PlantCandidate[]>([]);
+  const [selectedPhotoUrl, setSelectedPhotoUrl] = useState<string | null>(null);
+  const [selectedPhotoAttribution, setSelectedPhotoAttribution] = useState<string | null>(null);
   const [error, setError] = useState('');
   const [nickname, setNickname] = useState('');
   const [location, setLocation] = useState('');
@@ -71,14 +80,24 @@ export default function IdentifyPage() {
     setStep('loading');
 
     try {
-      const body = mode === 'photo'
-        ? { imageBase64, imageType, geoCoords }
-        : { searchText, geoCoords };
+      if (mode === 'search') {
+        const res = await fetch('/api/identify/candidates', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ description: searchText, geoCoords }),
+        });
+
+        if (!res.ok) throw new Error('Failed to find candidates');
+        const data = await res.json();
+        setCandidates(data.candidates);
+        setStep('candidates');
+        return;
+      }
 
       const res = await fetch('/api/identify', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(body),
+        body: JSON.stringify({ imageBase64, imageType, geoCoords }),
       });
 
       if (!res.ok) throw new Error('Failed to identify plant');
@@ -88,6 +107,29 @@ export default function IdentifyPage() {
     } catch {
       setError('Could not identify plant. Please try again.');
       setStep('input');
+    }
+  }
+
+  async function handleSelectCandidate(candidate: PlantCandidate) {
+    setError('');
+    setStep('loading');
+
+    try {
+      const res = await fetch('/api/identify', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ searchText: candidate.scientific_name, geoCoords }),
+      });
+
+      if (!res.ok) throw new Error('Failed to load plant details');
+      const data = await res.json();
+      setResult(data);
+      setSelectedPhotoUrl(candidate.photo_url);
+      setSelectedPhotoAttribution(candidate.photo_attribution_url);
+      setStep('result');
+    } catch {
+      setError('Could not load plant details. Please try again.');
+      setStep('candidates');
     }
   }
 
@@ -126,19 +168,22 @@ export default function IdentifyPage() {
     setSearchText('');
     setNickname('');
     setLocation('');
+    setCandidates([]);
+    setSelectedPhotoUrl(null);
+    setSelectedPhotoAttribution(null);
   }
 
   return (
     <div>
       <h1 className="text-2xl font-bold text-foreground mb-1">Identify a Plant</h1>
-      <p className="text-muted-foreground text-sm mb-6">Take a photo or search by name — AI will identify it and set up a care schedule</p>
+      <p className="text-muted-foreground text-sm mb-6">Take a photo or describe it — AI will show you matching options and set up a care schedule</p>
 
       {step === 'input' && (
         <div className="space-y-4">
           <Tabs value={mode} onValueChange={v => setMode(v as InputMode)}>
             <TabsList className="w-full">
               <TabsTrigger value="photo" className="flex-1">📷 Upload Photo</TabsTrigger>
-              <TabsTrigger value="search" className="flex-1">🔍 Search by Name</TabsTrigger>
+              <TabsTrigger value="search" className="flex-1">📝 Describe It</TabsTrigger>
             </TabsList>
           </Tabs>
 
@@ -184,9 +229,9 @@ export default function IdentifyPage() {
                 value={searchText}
                 onChange={e => { setSearchText(e.target.value); if (e.target.value.length === 1) requestGeolocation(); }}
                 onKeyDown={e => e.key === 'Enter' && searchText.trim() && handleIdentify()}
-                placeholder="e.g. 'monstera', 'snake plant', 'that spiky cactus'"
+                placeholder="e.g. 'monstera', 'tall plant with big shiny leaves', 'that spiky cactus'"
               />
-              <p className="text-xs text-muted-foreground mt-2">Don&apos;t know the name? Try describing it — &quot;tall plant with big leaves&quot; works too!</p>
+              <p className="text-xs text-muted-foreground mt-2">Describe what you see — name, shape, leaves, anything. We&apos;ll show you a few likely matches with photos to pick from.</p>
             </div>
           )}
 
@@ -200,7 +245,7 @@ export default function IdentifyPage() {
             className="w-full"
             size="lg"
           >
-            Identify Plant
+            {mode === 'photo' ? 'Identify Plant' : 'Find Matches'}
           </Button>
         </div>
       )}
@@ -210,6 +255,45 @@ export default function IdentifyPage() {
           <div className="text-5xl mb-4 animate-pulse">🔍</div>
           <p className="text-foreground font-medium">Identifying your plant...</p>
           <p className="text-muted-foreground text-sm mt-1">This takes a few seconds</p>
+        </div>
+      )}
+
+      {step === 'candidates' && (
+        <div className="space-y-3">
+          <p className="text-sm text-muted-foreground">Tap the one that matches:</p>
+          {candidates.map((candidate, i) => (
+            <button key={i} onClick={() => handleSelectCandidate(candidate)} className="w-full text-left">
+              <Card className="hover:shadow-md hover:ring-primary/20 transition-all">
+                <CardContent className="flex gap-4">
+                  <div className="w-20 h-20 rounded-xl overflow-hidden bg-accent flex items-center justify-center flex-shrink-0">
+                    {candidate.photo_url ? (
+                      <img src={candidate.photo_url} alt={candidate.common_name} className="w-full h-full object-cover" />
+                    ) : (
+                      <span className="text-4xl">🌿</span>
+                    )}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-start justify-between gap-2">
+                      <div>
+                        <h3 className="font-semibold text-foreground">{candidate.common_name}</h3>
+                        <p className="text-xs text-muted-foreground italic">{candidate.scientific_name}</p>
+                      </div>
+                      <Badge className={confidenceColors[candidate.confidence]}>{candidate.confidence}</Badge>
+                    </div>
+                    <p className="text-sm text-foreground/80 mt-1">{candidate.description}</p>
+                  </div>
+                </CardContent>
+              </Card>
+            </button>
+          ))}
+
+          {error && (
+            <div className="bg-destructive/10 text-destructive text-sm px-4 py-3 rounded-xl">{error}</div>
+          )}
+
+          <Button onClick={handleReset} variant="outline" className="w-full" size="lg">
+            Start Over
+          </Button>
         </div>
       )}
 
