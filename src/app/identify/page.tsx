@@ -145,7 +145,8 @@ export default function IdentifyPage() {
           ...result,
           nickname: nickname || null,
           location: location || null,
-          photo_url: mode === 'photo' ? imagePreview : null,
+          photo_url: mode === 'photo' ? imagePreview : selectedPhotoUrl,
+          photo_attribution_url: mode === 'search' ? selectedPhotoAttribution : null,
         }),
       });
 
@@ -315,8 +316,24 @@ export default function IdentifyPage() {
                 </div>
               </div>
 
-              {imagePreview && (
-                <img src={imagePreview} alt={result.common_name} className="w-full h-48 object-cover rounded-xl mb-3" />
+              {(imagePreview || selectedPhotoUrl) && (
+                <div className="mb-3">
+                  <img
+                    src={imagePreview || selectedPhotoUrl || ''}
+                    alt={result.common_name}
+                    className="w-full h-48 object-cover rounded-xl"
+                  />
+                  {selectedPhotoAttribution && (
+                    <a
+                      href={selectedPhotoAttribution}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-xs text-muted-foreground hover:underline"
+                    >
+                      Photo via Wikipedia
+                    </a>
+                  )}
+                </div>
               )}
 
               {result.description && (
@@ -422,6 +439,15 @@ export default function IdentifyPage() {
 
           {error && (
             <div className="bg-destructive/10 text-destructive text-sm px-4 py-3 rounded-xl">{error}</div>
+          )}
+
+          {mode === 'search' && candidates.length > 0 && (
+            <button
+              onClick={() => setStep('candidates')}
+              className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+            >
+              ← Back to results
+            </button>
           )}
 
           <div className="flex gap-3">
