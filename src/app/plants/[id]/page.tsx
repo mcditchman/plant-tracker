@@ -7,6 +7,7 @@ import CareLogButton from '@/components/CareLogButton';
 import DeletePlantButton from '@/components/DeletePlantButton';
 import PhotoAttribution from '@/components/PhotoAttribution';
 import SeasonalDataLoader from '@/components/SeasonalDataLoader';
+import SeasonTimeline from '@/components/SeasonTimeline';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
@@ -192,6 +193,8 @@ export default async function PlantDetailPage({ params }: { params: Promise<{ id
           </div>
         </CardContent>
       </Card>
+
+      <SeasonTimeline events={plant.seasonal_events} hemisphere={plant.hemisphere} />
 
       {/* Tips */}
       {plant.care_tips && plant.care_tips.length > 0 && (
