@@ -5,8 +5,8 @@ const client = new Anthropic();
 
 function buildSystemPrompt(geoCoords?: { lat: number; lng: number } | null) {
   const locationContext = geoCoords
-    ? `\n\nThe user is located at approximately ${geoCoords.lat.toFixed(2)}°, ${geoCoords.lng.toFixed(2)}°. Use this to tailor care advice to their local climate, seasons, humidity, and typical growing conditions.`
-    : '';
+    ? `\n\nThe user is located at approximately ${geoCoords.lat.toFixed(2)}°, ${geoCoords.lng.toFixed(2)}°. Use this to tailor care advice to their local climate, seasons, humidity, and typical growing conditions. This is in the ${geoCoords.lat >= 0 ? 'Northern' : 'Southern'} hemisphere — return all "seasonal" months below adjusted for this hemisphere (e.g. a spring bloomer in the Southern hemisphere blooms Sep-Nov, not Mar-May).`
+    : '\n\nNo location was provided — assume the Northern hemisphere for the "seasonal" months below.';
 
   return `You are a plant identification and care expert. When given an image or plant name, return a JSON object with plant identification and care information. Always respond with valid JSON only, no markdown.${locationContext}
 
@@ -28,7 +28,13 @@ Response format:
     "fertilizer": "string",
     "fertilize_frequency_days": number
   },
-  "tips": ["tip1", "tip2", "tip3", "tip4", "tip5"]
+  "tips": ["tip1", "tip2", "tip3", "tip4", "tip5"],
+  "seasonal": {
+    "bloom_months": [numbers 1-12, empty array if non-flowering or no notable bloom],
+    "growth_months": [numbers 1-12, months of active growth],
+    "dormancy_months": [numbers 1-12, months of dormancy/reduced growth, empty array if it grows steadily year-round],
+    "pruning_months": [numbers 1-12, best months to prune or repot]
+  }
 }
 
 If you cannot identify the plant, set "identified": false and use "Unknown Plant" for common_name. Always return valid JSON.`;
