@@ -6,6 +6,7 @@ import WaterButton from '@/components/WaterButton';
 import CareLogButton from '@/components/CareLogButton';
 import DeletePlantButton from '@/components/DeletePlantButton';
 import PhotoAttribution from '@/components/PhotoAttribution';
+import SeasonalDataLoader from '@/components/SeasonalDataLoader';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
@@ -70,6 +71,7 @@ export default async function PlantDetailPage({ params }: { params: Promise<{ id
 
   return (
     <div className="space-y-4">
+      <SeasonalDataLoader plantId={plant.id} hasSeasonalData={!!plant.seasonal_events} />
       <div className="flex items-center gap-3 mb-2">
         <Link href="/" className="text-muted-foreground hover:text-foreground transition-colors">← Back</Link>
       </div>
