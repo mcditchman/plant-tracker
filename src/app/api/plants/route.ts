@@ -47,6 +47,8 @@ export async function POST(request: NextRequest) {
       watering_frequency_days: body.care?.watering_frequency_days || body.watering_frequency_days || 7,
       fertilize_frequency_days: body.care?.fertilize_frequency_days || body.fertilize_frequency_days || 30,
       care_tips: body.tips || [],
+      seasonal_events: body.seasonal || null,
+      hemisphere: body.geoCoords ? (body.geoCoords.lat >= 0 ? 'northern' : 'southern') : null,
       next_watering_at: nextWatering.toISOString(),
     })
     .select()

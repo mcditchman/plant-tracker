@@ -147,6 +147,7 @@ export default function IdentifyPage() {
           location: location || null,
           photo_url: mode === 'photo' ? imagePreview : selectedPhotoUrl,
           photo_attribution_url: mode === 'search' ? selectedPhotoAttribution : null,
+          geoCoords,
         }),
       });
 
