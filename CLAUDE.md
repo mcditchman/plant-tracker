@@ -71,7 +71,11 @@ shadcn/ui primitives live in `src/components/ui/` (generated via `components.jso
 
 shadcn was initialized with `--base base-ui` (not Radix): compose with the `render` prop, not `asChild` — e.g. `<Button render={<Link href="/x" />}>text</Button>`. base-ui's `Button` defaults `nativeButton={true}`; when `render`-ing a non-`<button>` element (like `Link`), also pass `nativeButton={false}` or it throws a console warning on every render (only visible at runtime, not caught by `npm run build`).
 
+`Tabs`/`TabsList`/`TabsTrigger` are commonly used only to drive a controlled `value`/`onValueChange` tab state, without `TabsContent` — panel content is rendered manually based on that state instead (see `identify/page.tsx`, `SeasonTimeline.tsx`). This is the established pattern here, not a bug to fix.
+
 ## Environment notes (Windows)
 - `vercel` and `supabase` CLIs are both installed and on PATH (`vercel --version`, `supabase --version`) — use them directly rather than assuming they're missing or reaching for `npx`.
 - `git add`/`commit` print `LF will be replaced by CRLF` for every text file — harmless (no `.gitattributes`), not an error.
 - The Bash tool's `/tmp` resolves to `%LOCALAPPDATA%\Temp`, but a leading `/tmp/...` path passed to a Node.js script resolves against the current drive root instead (e.g. `C:\tmp\...`) — they are different directories. Use explicit Windows paths in any script whose output Claude needs to read back.
+- Work happens on one long-lived branch (`claude/plant-care-tracker-530199`) reused across multiple PRs into `master`, rather than a fresh branch per feature. Local `master` is not auto-updated between sessions — run `git fetch origin master` before computing `merge-base`/diffs for a new PR, or already-merged commits will look unmerged.
+- No browser-automation tool is available in this dev environment, and authenticated routes redirect before a bare `curl`/`fetch` can reach them (`src/middleware.ts`). Manual UI verification needs the user's own logged-in browser — don't burn turns working around this; ask the user to check, or rely on `tsc`/`lint`/`build` plus code-level review instead.
