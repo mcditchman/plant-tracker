@@ -5,6 +5,9 @@ import { UserPlant, CareLog } from '@/types';
 import WaterButton from '@/components/WaterButton';
 import CareLogButton from '@/components/CareLogButton';
 import DeletePlantButton from '@/components/DeletePlantButton';
+import PhotoAttribution from '@/components/PhotoAttribution';
+import SeasonalDataLoader from '@/components/SeasonalDataLoader';
+import SeasonTimeline from '@/components/SeasonTimeline';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
@@ -69,6 +72,7 @@ export default async function PlantDetailPage({ params }: { params: Promise<{ id
 
   return (
     <div className="space-y-4">
+      <SeasonalDataLoader plantId={plant.id} hasSeasonalData={!!plant.seasonal_events} />
       <div className="flex items-center gap-3 mb-2">
         <Link href="/" className="text-muted-foreground hover:text-foreground transition-colors">← Back</Link>
       </div>
@@ -76,7 +80,12 @@ export default async function PlantDetailPage({ params }: { params: Promise<{ id
       {/* Hero card */}
       <Card>
         {plant.photo_url && (
-          <img src={plant.photo_url} alt={plant.common_name} className="w-full h-52 object-cover" />
+          <div>
+            <img src={plant.photo_url} alt={plant.common_name} className="w-full h-52 object-cover" />
+            <div className="px-4 pt-1">
+              <PhotoAttribution url={plant.photo_attribution_url} />
+            </div>
+          </div>
         )}
         <CardContent>
           <div className="flex items-start justify-between">
@@ -184,6 +193,8 @@ export default async function PlantDetailPage({ params }: { params: Promise<{ id
           </div>
         </CardContent>
       </Card>
+
+      <SeasonTimeline events={plant.seasonal_events} hemisphere={plant.hemisphere} />
 
       {/* Tips */}
       {plant.care_tips && plant.care_tips.length > 0 && (

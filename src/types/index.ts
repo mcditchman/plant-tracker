@@ -1,5 +1,13 @@
 export type Difficulty = 'easy' | 'moderate' | 'hard';
 export type CareType = 'water' | 'fertilize' | 'prune' | 'repot' | 'mist' | 'other';
+export type Hemisphere = 'northern' | 'southern';
+
+export interface SeasonalEvents {
+  bloom_months: number[];
+  growth_months: number[];
+  dormancy_months: number[];
+  pruning_months: number[];
+}
 
 export interface UserPlant {
   id: string;
@@ -8,6 +16,7 @@ export interface UserPlant {
   scientific_name: string | null;
   nickname: string | null;
   photo_url: string | null;
+  photo_attribution_url: string | null;
   location: string | null;
   description: string | null;
   difficulty: Difficulty | null;
@@ -20,6 +29,8 @@ export interface UserPlant {
   watering_frequency_days: number;
   fertilize_frequency_days: number;
   care_tips: string[];
+  hemisphere: Hemisphere | null;
+  seasonal_events: SeasonalEvents | null;
   last_watered_at: string | null;
   next_watering_at: string | null;
   last_fertilized_at: string | null;
@@ -55,4 +66,14 @@ export interface PlantIdentification {
     fertilize_frequency_days: number;
   };
   tips: string[];
+  seasonal: SeasonalEvents;
+}
+
+export interface PlantCandidate {
+  common_name: string;
+  scientific_name: string;
+  confidence: 'high' | 'medium' | 'low';
+  description: string;
+  photo_url: string | null;
+  photo_attribution_url: string | null;
 }

@@ -2,6 +2,7 @@ import { createClient } from '@/lib/supabase/server';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import PlantCard from '@/components/PlantCard';
+import SeasonTimelineBoard from '@/components/SeasonTimelineBoard';
 import { UserPlant } from '@/types';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
@@ -55,6 +56,8 @@ export default async function HomePage() {
           </CardContent>
         </Card>
       )}
+
+      {plantList.length > 0 && <SeasonTimelineBoard plants={plantList} />}
 
       {plantList.length === 0 ? (
         <div className="text-center py-16">
