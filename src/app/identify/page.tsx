@@ -33,6 +33,7 @@ export default function IdentifyPage() {
   const [imageType, setImageType] = useState<string>('image/jpeg');
   const [result, setResult] = useState<PlantIdentification | null>(null);
   const [candidates, setCandidates] = useState<PlantCandidate[]>([]);
+  const [selectedCandidate, setSelectedCandidate] = useState<PlantCandidate | null>(null);
   const [selectedPhotoUrl, setSelectedPhotoUrl] = useState<string | null>(null);
   const [selectedPhotoAttribution, setSelectedPhotoAttribution] = useState<string | null>(null);
   const [error, setError] = useState('');
@@ -171,6 +172,7 @@ export default function IdentifyPage() {
     setNickname('');
     setLocation('');
     setCandidates([]);
+    setSelectedCandidate(null);
     setSelectedPhotoUrl(null);
     setSelectedPhotoAttribution(null);
   }
@@ -264,8 +266,8 @@ export default function IdentifyPage() {
         <div className="space-y-3">
           <p className="text-sm text-muted-foreground">Tap the one that matches:</p>
           {candidates.map((candidate, i) => (
-            <button key={i} onClick={() => handleSelectCandidate(candidate)} className="w-full text-left">
-              <Card className="hover:shadow-md hover:ring-primary/20 transition-all">
+            <button key={i} onClick={() => setSelectedCandidate(candidate)} className="w-full text-left">
+              <Card className={`hover:shadow-md transition-all ${selectedCandidate === candidate ? 'ring-2 ring-primary' : 'hover:ring-primary/20'}`}>
                 <CardContent className="flex gap-4">
                   <div className="w-20 h-20 rounded-xl overflow-hidden bg-accent flex items-center justify-center flex-shrink-0">
                     {candidate.photo_url ? (
@@ -292,6 +294,15 @@ export default function IdentifyPage() {
           {error && (
             <div className="bg-destructive/10 text-destructive text-sm px-4 py-3 rounded-xl">{error}</div>
           )}
+
+          <Button
+            onClick={() => selectedCandidate && handleSelectCandidate(selectedCandidate)}
+            disabled={!selectedCandidate}
+            className="w-full"
+            size="lg"
+          >
+            Generate Care Guide
+          </Button>
 
           <Button onClick={handleReset} variant="outline" className="w-full" size="lg">
             Start Over
