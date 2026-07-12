@@ -51,11 +51,11 @@ export default function CareLogButton({ plantId }: { plantId: string }) {
     <Sheet open={open} onOpenChange={setOpen}>
       <SheetTrigger render={<Button size="lg" variant="outline" className="gap-2" />}>
         <NotebookPen />
-        Log Care
+        Log care
       </SheetTrigger>
       <SheetContent side="bottom" showCloseButton={false}>
         <SheetHeader>
-          <SheetTitle>Log Care Activity</SheetTitle>
+          <SheetTitle>Log care</SheetTitle>
         </SheetHeader>
         <div className="px-4 grid grid-cols-3 gap-2">
           {careOptions.map(opt => (

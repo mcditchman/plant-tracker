@@ -15,11 +15,13 @@ function getWateringStatus(plant: UserPlant): { label: string; attention: boolea
   const diffDays = Math.ceil(diffMs / (1000 * 60 * 60 * 24));
 
   if (diffDays < 0) {
-    return { label: `${Math.abs(diffDays)}d overdue`, attention: true };
+    return { label: `${Math.abs(diffDays)} day${Math.abs(diffDays) !== 1 ? 's' : ''} overdue`, attention: true };
   } else if (diffDays === 0) {
     return { label: 'Water today', attention: true };
+  } else if (diffDays === 1) {
+    return { label: 'Water tomorrow', attention: false };
   } else {
-    return { label: `Water in ${diffDays}d`, attention: false };
+    return { label: `Water in ${diffDays} days`, attention: false };
   }
 }
 

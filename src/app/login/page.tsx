@@ -61,8 +61,8 @@ export default function LoginPage() {
           <CardContent>
             <Tabs value={mode} onValueChange={v => setMode(v as 'login' | 'signup')} className="mb-6">
               <TabsList className="w-full">
-                <TabsTrigger value="login" className="flex-1">Log In</TabsTrigger>
-                <TabsTrigger value="signup" className="flex-1">Sign Up</TabsTrigger>
+                <TabsTrigger value="login" className="flex-1">Log in</TabsTrigger>
+                <TabsTrigger value="signup" className="flex-1">Sign up</TabsTrigger>
               </TabsList>
             </Tabs>
 
@@ -103,7 +103,7 @@ export default function LoginPage() {
               )}
 
               <Button type="submit" disabled={loading} className="w-full">
-                {loading ? '...' : mode === 'login' ? 'Log In' : 'Create Account'}
+                {loading ? '...' : mode === 'login' ? 'Log in' : 'Create account'}
               </Button>
             </form>
           </CardContent>

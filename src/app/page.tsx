@@ -1,12 +1,11 @@
 import { createClient } from '@/lib/supabase/server';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
-import { Droplet, Plus, Sprout } from 'lucide-react';
+import { Plus, Sprout } from 'lucide-react';
 import PlantCard from '@/components/PlantCard';
 import SeasonTimelineBoard from '@/components/SeasonTimelineBoard';
 import { UserPlant } from '@/types';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
 
 export default async function HomePage() {
   const supabase = await createClient();
@@ -29,11 +28,6 @@ export default async function HomePage() {
     return aNext - bNext;
   });
 
-  const needsWater = sortedPlants.filter(p => {
-    if (!p.next_watering_at) return false;
-    return new Date(p.next_watering_at) <= new Date();
-  });
-
   return (
     <div>
       <div className="flex items-center justify-between mb-6">
@@ -44,22 +38,9 @@ export default async function HomePage() {
           </p>
         </div>
         <Button render={<Link href="/identify" />} nativeButton={false}>
-          <Plus /> Add Plant
+          <Plus /> Add plant
         </Button>
       </div>
-
-      {needsWater.length > 0 && (
-        <Card className="mb-6">
-          <CardContent>
-            <p className="text-attention font-medium text-sm flex items-center gap-2">
-              <Droplet className="size-4" />
-              {needsWater.length} plant{needsWater.length !== 1 ? 's' : ''} need{needsWater.length === 1 ? 's' : ''} water
-            </p>
-          </CardContent>
-        </Card>
-      )}
-
-      {plantList.length > 0 && <SeasonTimelineBoard plants={plantList} />}
 
       {plantList.length === 0 ? (
         <div className="text-center py-16">
@@ -69,15 +50,20 @@ export default async function HomePage() {
             Take a photo or search by name and AI will identify your plant and set up a care schedule.
           </p>
           <Button render={<Link href="/identify" />} nativeButton={false} size="lg">
-            Identify a Plant
+            Identify a plant
           </Button>
         </div>
       ) : (
-        <div className="space-y-3">
-          {sortedPlants.map(plant => (
-            <PlantCard key={plant.id} plant={plant} />
-          ))}
-        </div>
+        <>
+          <div className="space-y-3">
+            {sortedPlants.map(plant => (
+              <PlantCard key={plant.id} plant={plant} />
+            ))}
+          </div>
+          <div className="mt-6">
+            <SeasonTimelineBoard plants={plantList} />
+          </div>
+        </>
       )}
     </div>
   );

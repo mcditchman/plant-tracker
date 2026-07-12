@@ -37,11 +37,11 @@ function groupLabel(days: number): string {
   if (days < 0) return 'Overdue';
   if (days === 0) return 'Today';
   if (days === 1) return 'Tomorrow';
-  if (days <= 7) return 'This Week';
+  if (days <= 7) return 'This week';
   return 'Later';
 }
 
-const groupOrder = ['Overdue', 'Today', 'Tomorrow', 'This Week', 'Later'];
+const groupOrder = ['Overdue', 'Today', 'Tomorrow', 'This week', 'Later'];
 
 // Color marks urgency only: overdue/today get the attention color, the rest stay muted
 const attentionGroups = new Set(['Overdue', 'Today']);
@@ -105,7 +105,7 @@ export default async function SchedulePage() {
             Add a plant to start tracking watering and maintenance.
           </p>
           <Button render={<Link href="/identify" />} nativeButton={false} size="lg">
-            Identify a Plant
+            Identify a plant
           </Button>
         </div>
       ) : (
@@ -123,10 +123,10 @@ export default async function SchedulePage() {
                       const info = eventInfo[event.type];
                       const days = diffInDays(event.date);
                       const dayText =
-                        days < 0 ? `${Math.abs(days)}d overdue` :
+                        days < 0 ? `${Math.abs(days)} day${Math.abs(days) !== 1 ? 's' : ''} overdue` :
                         days === 0 ? 'Today' :
                         days === 1 ? 'Tomorrow' :
-                        `In ${days}d`;
+                        `In ${days} days`;
 
                       return (
                         <Link

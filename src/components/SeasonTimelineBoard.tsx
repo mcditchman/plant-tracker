@@ -20,8 +20,8 @@ const NORTHERN_BANDS = [
 
 const CATEGORIES: { key: Category; label: string; Icon: LucideIcon }[] = [
   { key: 'bloom', label: 'Bloom', Icon: Flower2 },
-  { key: 'growth', label: 'Growth Cycle', Icon: Leaf },
-  { key: 'pruning', label: 'Pruning & Repotting', Icon: Scissors },
+  { key: 'growth', label: 'Growth cycle', Icon: Leaf },
+  { key: 'pruning', label: 'Pruning & repotting', Icon: Scissors },
 ];
 
 function plantHasCategory(plant: UserPlant, category: Category): boolean {
@@ -38,9 +38,9 @@ export default function SeasonTimelineBoard({ plants }: { plants: UserPlant[] })
   const qualifyingPlants = plants.filter(p => plantHasCategory(p, category));
 
   return (
-    <Card className="mb-6">
+    <Card>
       <CardContent>
-        <h2 className="font-semibold text-foreground mb-3">Season Overview</h2>
+        <h2 className="font-semibold text-foreground mb-3">Season overview</h2>
         <Tabs value={category} onValueChange={v => setCategory(v as Category)}>
           <TabsList className="w-full mb-4">
             {CATEGORIES.map(c => (

@@ -3,7 +3,6 @@ import { useState } from 'react';
 import { Flower2, Leaf, Scissors, Snowflake, type LucideIcon } from 'lucide-react';
 import { SeasonalEvents, Hemisphere } from '@/types';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Card, CardContent } from '@/components/ui/card';
 
 type Category = 'bloom' | 'growth' | 'pruning';
 
@@ -30,8 +29,8 @@ function getSeasonBands(hemisphere: Hemisphere | null) {
 
 const CATEGORIES: { key: Category; label: string; Icon: LucideIcon }[] = [
   { key: 'bloom', label: 'Bloom', Icon: Flower2 },
-  { key: 'growth', label: 'Growth Cycle', Icon: Leaf },
-  { key: 'pruning', label: 'Pruning & Repotting', Icon: Scissors },
+  { key: 'growth', label: 'Growth cycle', Icon: Leaf },
+  { key: 'pruning', label: 'Pruning & repotting', Icon: Scissors },
 ];
 
 const EMPTY_MESSAGES: Record<Category, string> = {
@@ -52,8 +51,7 @@ export default function SeasonTimeline({ events, hemisphere }: { events: Seasona
   const bands = getSeasonBands(hemisphere);
 
   return (
-    <Card>
-      <CardContent>
+    <section>
         <h2 className="font-semibold text-foreground mb-3">Season</h2>
         <Tabs value={category} onValueChange={v => setCategory(v as Category)}>
           <TabsList className="w-full mb-4">
@@ -102,7 +100,6 @@ export default function SeasonTimeline({ events, hemisphere }: { events: Seasona
             )}
           </div>
         )}
-      </CardContent>
-    </Card>
+    </section>
   );
 }

@@ -67,6 +67,15 @@ const difficultyInfo = {
   hard: { label: 'Advanced' },
 };
 
+const careFields: { field: keyof UserPlant; label: string; Icon: LucideIcon }[] = [
+  { field: 'care_water', label: 'Water', Icon: Droplet },
+  { field: 'care_light', label: 'Light', Icon: Sun },
+  { field: 'care_humidity', label: 'Humidity', Icon: Droplets },
+  { field: 'care_temperature', label: 'Temperature', Icon: Thermometer },
+  { field: 'care_soil', label: 'Soil', Icon: Layers },
+  { field: 'care_fertilizer', label: 'Fertilizer', Icon: Sprout },
+];
+
 export default async function PlantDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   const supabase = await createClient();
@@ -86,51 +95,47 @@ export default async function PlantDetailPage({ params }: { params: Promise<{ id
   const diff = plant.difficulty ? difficultyInfo[plant.difficulty] : null;
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-6">
       <SeasonalDataLoader plantId={plant.id} hasSeasonalData={!!plant.seasonal_events} />
-      <div className="flex items-center gap-3 mb-2">
+      <div className="flex items-center gap-3">
         <Link href="/" className="text-muted-foreground hover:text-foreground transition-colors">← Back</Link>
       </div>
 
-      {/* Hero card */}
-      <Card>
+      {/* Photo + identity */}
+      <div>
         {plant.photo_url && (
-          <div>
-            <img src={plant.photo_url} alt={plant.common_name} className="w-full h-52 object-cover" />
-            <div className="px-4 pt-1">
-              <PhotoAttribution url={plant.photo_attribution_url} />
-            </div>
+          <div className="mb-4">
+            <img src={plant.photo_url} alt={plant.common_name} className="w-full h-64 object-cover rounded-2xl" />
+            <PhotoAttribution url={plant.photo_attribution_url} />
           </div>
         )}
-        <CardContent>
-          <div className="flex items-start justify-between">
-            <div>
-              <h1 className="text-2xl font-bold text-foreground">
-                {plant.nickname || plant.common_name}
-              </h1>
-              {plant.nickname && <p className="text-muted-foreground text-sm">{plant.common_name}</p>}
-              {plant.scientific_name && (
-                <p className="text-muted-foreground text-sm italic">{plant.scientific_name}</p>
-              )}
-            </div>
-            {diff && (
-              <Badge variant="secondary">{diff.label}</Badge>
+        <div className="flex items-start justify-between">
+          <div>
+            <h1 className="text-2xl font-bold text-foreground">
+              {plant.nickname || plant.common_name}
+            </h1>
+            {plant.nickname && <p className="text-muted-foreground text-sm">{plant.common_name}</p>}
+            {plant.scientific_name && (
+              <p className="text-muted-foreground text-sm italic">{plant.scientific_name}</p>
             )}
           </div>
-          {plant.location && (
-            <p className="text-sm text-muted-foreground mt-2 flex items-center gap-1">
-              <MapPin className="size-3.5" /> {plant.location}
-            </p>
+          {diff && (
+            <Badge variant="secondary">{diff.label}</Badge>
           )}
-          {plant.description && (
-            <p className="text-sm text-foreground/80 mt-3 leading-relaxed">{plant.description}</p>
-          )}
-        </CardContent>
-      </Card>
+        </div>
+        {plant.location && (
+          <p className="text-sm text-muted-foreground mt-2 flex items-center gap-1">
+            <MapPin className="size-3.5" /> {plant.location}
+          </p>
+        )}
+        {plant.description && (
+          <p className="text-sm text-foreground/80 mt-3 leading-relaxed">{plant.description}</p>
+        )}
+      </div>
 
-      {/* Watering status */}
+      {/* Watering status — the one actionable block keeps a card */}
       <Card>
-        <CardContent className="flex items-center justify-between">
+        <CardContent className="flex items-center justify-between gap-3">
           <div>
             <p className={`font-semibold flex items-center gap-2 ${waterStatus.attention ? 'text-attention' : 'text-foreground'}`}>
               <Droplet className="size-4" /> {waterStatus.label}
@@ -143,82 +148,43 @@ export default async function PlantDetailPage({ params }: { params: Promise<{ id
         </CardContent>
       </Card>
 
-      {/* Care actions */}
       <div className="flex gap-3">
         <CareLogButton plantId={plant.id} />
       </div>
 
-      {/* Care requirements */}
-      <Card>
-        <CardContent>
-          <h2 className="font-semibold text-foreground mb-4">Care Guide</h2>
-          <div className="space-y-3">
-            {plant.care_water && (
-              <div className="flex gap-3">
-                <Droplet className="size-4.5 text-muted-foreground flex-shrink-0" />
+      <Separator />
+
+      {/* Care guide */}
+      <section>
+        <h2 className="font-semibold text-foreground mb-4">Care guide</h2>
+        <div className="space-y-4">
+          {careFields.map(({ field, label, Icon }) => {
+            const value = plant[field];
+            if (!value || typeof value !== 'string') return null;
+            return (
+              <div key={field} className="flex gap-3">
+                <Icon className="size-4.5 text-muted-foreground flex-shrink-0" />
                 <div>
-                  <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-0.5">Water</p>
-                  <p className="text-sm text-foreground/80">{plant.care_water}</p>
+                  <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-0.5">{label}</p>
+                  <p className="text-sm text-foreground/80">{value}</p>
                 </div>
               </div>
-            )}
-            {plant.care_light && (
-              <div className="flex gap-3">
-                <Sun className="size-4.5 text-muted-foreground flex-shrink-0" />
-                <div>
-                  <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-0.5">Light</p>
-                  <p className="text-sm text-foreground/80">{plant.care_light}</p>
-                </div>
-              </div>
-            )}
-            {plant.care_humidity && (
-              <div className="flex gap-3">
-                <Droplets className="size-4.5 text-muted-foreground flex-shrink-0" />
-                <div>
-                  <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-0.5">Humidity</p>
-                  <p className="text-sm text-foreground/80">{plant.care_humidity}</p>
-                </div>
-              </div>
-            )}
-            {plant.care_temperature && (
-              <div className="flex gap-3">
-                <Thermometer className="size-4.5 text-muted-foreground flex-shrink-0" />
-                <div>
-                  <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-0.5">Temperature</p>
-                  <p className="text-sm text-foreground/80">{plant.care_temperature}</p>
-                </div>
-              </div>
-            )}
-            {plant.care_soil && (
-              <div className="flex gap-3">
-                <Layers className="size-4.5 text-muted-foreground flex-shrink-0" />
-                <div>
-                  <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-0.5">Soil</p>
-                  <p className="text-sm text-foreground/80">{plant.care_soil}</p>
-                </div>
-              </div>
-            )}
-            {plant.care_fertilizer && (
-              <div className="flex gap-3">
-                <Sprout className="size-4.5 text-muted-foreground flex-shrink-0" />
-                <div>
-                  <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-0.5">Fertilizer</p>
-                  <p className="text-sm text-foreground/80">{plant.care_fertilizer}</p>
-                </div>
-              </div>
-            )}
-          </div>
-        </CardContent>
-      </Card>
+            );
+          })}
+        </div>
+      </section>
+
+      <Separator />
 
       <SeasonTimeline events={plant.seasonal_events} hemisphere={plant.hemisphere} />
 
       {/* Tips */}
       {plant.care_tips && plant.care_tips.length > 0 && (
-        <Card className="bg-accent">
-          <CardContent>
+        <>
+          <Separator />
+          <section>
             <h2 className="font-semibold text-foreground mb-3 flex items-center gap-2">
-              <Lightbulb className="size-4" /> Care Tips
+              <Lightbulb className="size-4" /> Care tips
             </h2>
             <ul className="space-y-2">
               {plant.care_tips.map((tip, i) => (
@@ -228,40 +194,36 @@ export default async function PlantDetailPage({ params }: { params: Promise<{ id
                 </li>
               ))}
             </ul>
-          </CardContent>
-        </Card>
+          </section>
+        </>
       )}
 
-      {/* Care history */}
-      <Card>
-        <CardContent>
-          <h2 className="font-semibold text-foreground mb-4">Care History</h2>
-          {logs.length === 0 ? (
-            <p className="text-muted-foreground text-sm">No care activities logged yet. Start by watering your plant!</p>
-          ) : (
-            <div className="space-y-3">
-              {logs.map((log, i) => {
-                const info = careTypeLabels[log.care_type] || { label: log.care_type, Icon: NotebookPen };
-                return (
-                  <div key={log.id}>
-                    <div className="flex items-center gap-3">
-                      <info.Icon className="size-4 text-muted-foreground" />
-                      <div className="flex-1">
-                        <p className="text-sm font-medium text-foreground">{info.label}</p>
-                        {log.notes && <p className="text-xs text-muted-foreground">{log.notes}</p>}
-                      </div>
-                      <p className="text-xs text-muted-foreground">{formatDate(log.performed_at)}</p>
-                    </div>
-                    {i < logs.length - 1 && <Separator className="mt-3" />}
-                  </div>
-                );
-              })}
-            </div>
-          )}
-        </CardContent>
-      </Card>
+      <Separator />
 
-      {/* Danger zone */}
+      {/* Care history */}
+      <section>
+        <h2 className="font-semibold text-foreground mb-4">Care history</h2>
+        {logs.length === 0 ? (
+          <p className="text-muted-foreground text-sm">Nothing logged yet. Watering and other care will show up here.</p>
+        ) : (
+          <div className="space-y-3">
+            {logs.map(log => {
+              const info = careTypeLabels[log.care_type] || { label: log.care_type, Icon: NotebookPen };
+              return (
+                <div key={log.id} className="flex items-center gap-3">
+                  <info.Icon className="size-4 text-muted-foreground" />
+                  <div className="flex-1">
+                    <p className="text-sm font-medium text-foreground">{info.label}</p>
+                    {log.notes && <p className="text-xs text-muted-foreground">{log.notes}</p>}
+                  </div>
+                  <p className="text-xs text-muted-foreground">{formatDate(log.performed_at)}</p>
+                </div>
+              );
+            })}
+          </div>
+        )}
+      </section>
+
       <div className="pb-4">
         <DeletePlantButton plantId={plant.id} />
       </div>
