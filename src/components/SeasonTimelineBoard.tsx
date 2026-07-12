@@ -1,6 +1,7 @@
 'use client';
 import { Fragment, useState } from 'react';
 import Link from 'next/link';
+import { Flower2, Leaf, Scissors, type LucideIcon } from 'lucide-react';
 import { UserPlant } from '@/types';
 import { Card, CardContent } from '@/components/ui/card';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -11,16 +12,16 @@ const MONTH_ORDER = [9, 10, 11, 12, 1, 2, 3, 4, 5, 6, 7, 8];
 const MONTH_LABELS = ['Sep', 'Oct', 'Nov', 'Dec', 'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug'];
 
 const NORTHERN_BANDS = [
-  { name: 'Fall', color: 'bg-orange-400' },
-  { name: 'Winter', color: 'bg-cyan-400' },
-  { name: 'Spring', color: 'bg-green-400' },
-  { name: 'Summer', color: 'bg-yellow-400' },
+  { name: 'Fall', color: 'bg-orange-400/20' },
+  { name: 'Winter', color: 'bg-cyan-400/20' },
+  { name: 'Spring', color: 'bg-green-400/20' },
+  { name: 'Summer', color: 'bg-yellow-400/20' },
 ];
 
-const CATEGORIES: { key: Category; label: string; icon: string }[] = [
-  { key: 'bloom', label: 'Bloom', icon: '🌸' },
-  { key: 'growth', label: 'Growth Cycle', icon: '🌿' },
-  { key: 'pruning', label: 'Pruning & Repotting', icon: '✂️' },
+const CATEGORIES: { key: Category; label: string; Icon: LucideIcon }[] = [
+  { key: 'bloom', label: 'Bloom', Icon: Flower2 },
+  { key: 'growth', label: 'Growth Cycle', Icon: Leaf },
+  { key: 'pruning', label: 'Pruning & Repotting', Icon: Scissors },
 ];
 
 function plantHasCategory(plant: UserPlant, category: Category): boolean {
@@ -43,7 +44,9 @@ export default function SeasonTimelineBoard({ plants }: { plants: UserPlant[] })
         <Tabs value={category} onValueChange={v => setCategory(v as Category)}>
           <TabsList className="w-full mb-4">
             {CATEGORIES.map(c => (
-              <TabsTrigger key={c.key} value={c.key} className="flex-1">{c.icon} {c.label}</TabsTrigger>
+              <TabsTrigger key={c.key} value={c.key} className="flex-1">
+                <c.Icon className="size-3.5" /> {c.label}
+              </TabsTrigger>
             ))}
           </TabsList>
         </Tabs>
@@ -52,7 +55,7 @@ export default function SeasonTimelineBoard({ plants }: { plants: UserPlant[] })
           <div />
           <div className="grid grid-cols-12 gap-px text-center">
             {NORTHERN_BANDS.map((band, i) => (
-              <div key={i} className={`col-span-3 ${band.color} text-white text-xs font-medium py-1 rounded-sm`}>
+              <div key={i} className={`col-span-3 ${band.color} text-foreground/70 text-xs font-medium py-1 rounded-sm`}>
                 {band.name}
               </div>
             ))}
@@ -86,7 +89,7 @@ export default function SeasonTimelineBoard({ plants }: { plants: UserPlant[] })
                     return (
                       <div
                         key={month}
-                        className={`h-6 rounded-sm ${active ? (isDormant ? 'bg-slate-300' : 'bg-primary/60') : 'bg-muted/40'}`}
+                        className={`h-6 rounded-sm ${active ? (isDormant ? 'bg-muted-foreground/25' : 'bg-primary/60') : 'bg-muted/40'}`}
                       />
                     );
                   })}

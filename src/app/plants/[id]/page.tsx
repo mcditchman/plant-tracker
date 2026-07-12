@@ -1,6 +1,21 @@
 import { createClient } from '@/lib/supabase/server';
 import { redirect, notFound } from 'next/navigation';
 import Link from 'next/link';
+import {
+  Droplet,
+  Droplets,
+  Layers,
+  Lightbulb,
+  MapPin,
+  NotebookPen,
+  Scissors,
+  Shovel,
+  SprayCan,
+  Sprout,
+  Sun,
+  Thermometer,
+  type LucideIcon,
+} from 'lucide-react';
 import { UserPlant, CareLog } from '@/types';
 import WaterButton from '@/components/WaterButton';
 import CareLogButton from '@/components/CareLogButton';
@@ -25,31 +40,31 @@ function formatDate(dateStr: string | null): string {
 }
 
 function getWateringStatus(plant: UserPlant) {
-  if (!plant.next_watering_at) return { label: 'Not scheduled', color: 'text-muted-foreground', bg: 'bg-muted' };
+  if (!plant.next_watering_at) return { label: 'Not scheduled', attention: false };
   const now = new Date();
   const next = new Date(plant.next_watering_at);
   const diffMs = next.getTime() - now.getTime();
   const diffDays = Math.ceil(diffMs / (1000 * 60 * 60 * 24));
 
-  if (diffDays < 0) return { label: `${Math.abs(diffDays)} day${Math.abs(diffDays) !== 1 ? 's' : ''} overdue`, color: 'text-red-600', bg: 'bg-red-50' };
-  if (diffDays === 0) return { label: 'Water today!', color: 'text-orange-600', bg: 'bg-orange-50' };
-  if (diffDays === 1) return { label: 'Water tomorrow', color: 'text-yellow-600', bg: 'bg-yellow-50' };
-  return { label: `Water in ${diffDays} days`, color: 'text-green-600', bg: 'bg-green-50' };
+  if (diffDays < 0) return { label: `${Math.abs(diffDays)} day${Math.abs(diffDays) !== 1 ? 's' : ''} overdue`, attention: true };
+  if (diffDays === 0) return { label: 'Water today', attention: true };
+  if (diffDays === 1) return { label: 'Water tomorrow', attention: false };
+  return { label: `Water in ${diffDays} days`, attention: false };
 }
 
-const careTypeLabels: Record<string, { label: string; icon: string }> = {
-  water: { label: 'Watered', icon: '💧' },
-  fertilize: { label: 'Fertilized', icon: '🌱' },
-  prune: { label: 'Pruned', icon: '✂️' },
-  repot: { label: 'Repotted', icon: '🪴' },
-  mist: { label: 'Misted', icon: '🌫️' },
-  other: { label: 'Care', icon: '📝' },
+const careTypeLabels: Record<string, { label: string; Icon: LucideIcon }> = {
+  water: { label: 'Watered', Icon: Droplet },
+  fertilize: { label: 'Fertilized', Icon: Sprout },
+  prune: { label: 'Pruned', Icon: Scissors },
+  repot: { label: 'Repotted', Icon: Shovel },
+  mist: { label: 'Misted', Icon: SprayCan },
+  other: { label: 'Care', Icon: NotebookPen },
 };
 
 const difficultyInfo = {
-  easy: { label: 'Easy', className: 'bg-green-100 text-green-700' },
-  moderate: { label: 'Moderate', className: 'bg-yellow-100 text-yellow-700' },
-  hard: { label: 'Advanced', className: 'bg-red-100 text-red-700' },
+  easy: { label: 'Easy' },
+  moderate: { label: 'Moderate' },
+  hard: { label: 'Advanced' },
 };
 
 export default async function PlantDetailPage({ params }: { params: Promise<{ id: string }> }) {
@@ -99,12 +114,12 @@ export default async function PlantDetailPage({ params }: { params: Promise<{ id
               )}
             </div>
             {diff && (
-              <Badge className={diff.className}>{diff.label}</Badge>
+              <Badge variant="secondary">{diff.label}</Badge>
             )}
           </div>
           {plant.location && (
             <p className="text-sm text-muted-foreground mt-2 flex items-center gap-1">
-              <span>📍</span> {plant.location}
+              <MapPin className="size-3.5" /> {plant.location}
             </p>
           )}
           {plant.description && (
@@ -114,10 +129,12 @@ export default async function PlantDetailPage({ params }: { params: Promise<{ id
       </Card>
 
       {/* Watering status */}
-      <Card className={waterStatus.bg}>
+      <Card>
         <CardContent className="flex items-center justify-between">
           <div>
-            <p className={`font-semibold ${waterStatus.color}`}>💧 {waterStatus.label}</p>
+            <p className={`font-semibold flex items-center gap-2 ${waterStatus.attention ? 'text-attention' : 'text-foreground'}`}>
+              <Droplet className="size-4" /> {waterStatus.label}
+            </p>
             <p className="text-xs text-muted-foreground mt-0.5">
               Last watered: {formatDate(plant.last_watered_at)} · Every {plant.watering_frequency_days} days
             </p>
@@ -138,7 +155,7 @@ export default async function PlantDetailPage({ params }: { params: Promise<{ id
           <div className="space-y-3">
             {plant.care_water && (
               <div className="flex gap-3">
-                <span className="text-xl w-7 flex-shrink-0">💧</span>
+                <Droplet className="size-4.5 text-muted-foreground flex-shrink-0" />
                 <div>
                   <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-0.5">Water</p>
                   <p className="text-sm text-foreground/80">{plant.care_water}</p>
@@ -147,7 +164,7 @@ export default async function PlantDetailPage({ params }: { params: Promise<{ id
             )}
             {plant.care_light && (
               <div className="flex gap-3">
-                <span className="text-xl w-7 flex-shrink-0">☀️</span>
+                <Sun className="size-4.5 text-muted-foreground flex-shrink-0" />
                 <div>
                   <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-0.5">Light</p>
                   <p className="text-sm text-foreground/80">{plant.care_light}</p>
@@ -156,7 +173,7 @@ export default async function PlantDetailPage({ params }: { params: Promise<{ id
             )}
             {plant.care_humidity && (
               <div className="flex gap-3">
-                <span className="text-xl w-7 flex-shrink-0">🌫️</span>
+                <Droplets className="size-4.5 text-muted-foreground flex-shrink-0" />
                 <div>
                   <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-0.5">Humidity</p>
                   <p className="text-sm text-foreground/80">{plant.care_humidity}</p>
@@ -165,7 +182,7 @@ export default async function PlantDetailPage({ params }: { params: Promise<{ id
             )}
             {plant.care_temperature && (
               <div className="flex gap-3">
-                <span className="text-xl w-7 flex-shrink-0">🌡️</span>
+                <Thermometer className="size-4.5 text-muted-foreground flex-shrink-0" />
                 <div>
                   <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-0.5">Temperature</p>
                   <p className="text-sm text-foreground/80">{plant.care_temperature}</p>
@@ -174,7 +191,7 @@ export default async function PlantDetailPage({ params }: { params: Promise<{ id
             )}
             {plant.care_soil && (
               <div className="flex gap-3">
-                <span className="text-xl w-7 flex-shrink-0">🪱</span>
+                <Layers className="size-4.5 text-muted-foreground flex-shrink-0" />
                 <div>
                   <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-0.5">Soil</p>
                   <p className="text-sm text-foreground/80">{plant.care_soil}</p>
@@ -183,7 +200,7 @@ export default async function PlantDetailPage({ params }: { params: Promise<{ id
             )}
             {plant.care_fertilizer && (
               <div className="flex gap-3">
-                <span className="text-xl w-7 flex-shrink-0">🌱</span>
+                <Sprout className="size-4.5 text-muted-foreground flex-shrink-0" />
                 <div>
                   <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-0.5">Fertilizer</p>
                   <p className="text-sm text-foreground/80">{plant.care_fertilizer}</p>
@@ -200,7 +217,9 @@ export default async function PlantDetailPage({ params }: { params: Promise<{ id
       {plant.care_tips && plant.care_tips.length > 0 && (
         <Card className="bg-accent">
           <CardContent>
-            <h2 className="font-semibold text-foreground mb-3">💡 Care Tips</h2>
+            <h2 className="font-semibold text-foreground mb-3 flex items-center gap-2">
+              <Lightbulb className="size-4" /> Care Tips
+            </h2>
             <ul className="space-y-2">
               {plant.care_tips.map((tip, i) => (
                 <li key={i} className="text-sm text-foreground/80 flex gap-2">
@@ -222,11 +241,11 @@ export default async function PlantDetailPage({ params }: { params: Promise<{ id
           ) : (
             <div className="space-y-3">
               {logs.map((log, i) => {
-                const info = careTypeLabels[log.care_type] || { label: log.care_type, icon: '📝' };
+                const info = careTypeLabels[log.care_type] || { label: log.care_type, Icon: NotebookPen };
                 return (
                   <div key={log.id}>
                     <div className="flex items-center gap-3">
-                      <span className="text-lg">{info.icon}</span>
+                      <info.Icon className="size-4 text-muted-foreground" />
                       <div className="flex-1">
                         <p className="text-sm font-medium text-foreground">{info.label}</p>
                         {log.notes && <p className="text-xs text-muted-foreground">{log.notes}</p>}
