@@ -1,8 +1,9 @@
 import { createClient } from '@/lib/supabase/server';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
-import { CalendarDays, Droplet, Leaf, Sprout, TriangleAlert } from 'lucide-react';
+import { CalendarDays, ChevronDown, Droplet, Leaf, Sprout, TriangleAlert } from 'lucide-react';
 import { UserPlant } from '@/types';
+import QuickCareButton from '@/components/QuickCareButton';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 
@@ -115,51 +116,71 @@ export default async function SchedulePage() {
             .map(label => {
               const attention = attentionGroups.has(label);
               const headerColor = attention ? 'text-attention' : 'text-muted-foreground';
+              const groupEvents = grouped.get(label)!;
+
+              const rows = (
+                <div className="space-y-2">
+                  {groupEvents.map((event, i) => {
+                    const info = eventInfo[event.type];
+                    const days = diffInDays(event.date);
+                    const dayText =
+                      days < 0 ? `${Math.abs(days)} day${Math.abs(days) !== 1 ? 's' : ''} overdue` :
+                      days === 0 ? 'Today' :
+                      days === 1 ? 'Tomorrow' :
+                      `In ${days} days`;
+
+                    return (
+                      <Link
+                        key={`${event.plant.id}-${event.type}-${i}`}
+                        href={`/plants/${event.plant.id}`}
+                        className="block"
+                      >
+                        <Card className="hover:shadow-md hover:ring-primary/20 transition-all" size="sm">
+                          <CardContent className="flex items-center gap-3">
+                            <div className="w-10 h-10 rounded-lg overflow-hidden bg-accent flex items-center justify-center flex-shrink-0">
+                              {event.plant.photo_url ? (
+                                <img src={event.plant.photo_url} alt={event.plant.common_name} className="w-full h-full object-cover" />
+                              ) : (
+                                <Leaf className="size-5 text-primary/40" />
+                              )}
+                            </div>
+                            <div className="flex-1 min-w-0">
+                              <p className="font-medium text-foreground text-sm truncate">
+                                {event.plant.nickname || event.plant.common_name}
+                              </p>
+                              <p className="text-xs text-muted-foreground flex items-center gap-1">
+                                <info.Icon className="size-3" /> {info.label}
+                              </p>
+                            </div>
+                            <span className={`text-xs font-medium ${attention ? 'text-attention' : 'text-muted-foreground'} flex-shrink-0`}>
+                              {dayText}
+                            </span>
+                            {attention && <QuickCareButton plantId={event.plant.id} action={event.type} compact />}
+                          </CardContent>
+                        </Card>
+                      </Link>
+                    );
+                  })}
+                </div>
+              );
+
+              // "Later" is weeks-away noise; keep it collapsed by default
+              if (label === 'Later') {
+                return (
+                  <details key={label} className="group">
+                    <summary className={`text-sm font-semibold mb-2 ${headerColor} cursor-pointer list-none flex items-center gap-1`}>
+                      Later ({groupEvents.length})
+                      <ChevronDown className="size-3.5 transition-transform group-open:rotate-180" />
+                    </summary>
+                    {rows}
+                  </details>
+                );
+              }
+
               return (
                 <div key={label}>
                   <h2 className={`text-sm font-semibold mb-2 ${headerColor}`}>{label}</h2>
-                  <div className="space-y-2">
-                    {grouped.get(label)!.map((event, i) => {
-                      const info = eventInfo[event.type];
-                      const days = diffInDays(event.date);
-                      const dayText =
-                        days < 0 ? `${Math.abs(days)} day${Math.abs(days) !== 1 ? 's' : ''} overdue` :
-                        days === 0 ? 'Today' :
-                        days === 1 ? 'Tomorrow' :
-                        `In ${days} days`;
-
-                      return (
-                        <Link
-                          key={`${event.plant.id}-${event.type}-${i}`}
-                          href={`/plants/${event.plant.id}`}
-                          className="block"
-                        >
-                          <Card className="hover:shadow-md hover:ring-primary/20 transition-all" size="sm">
-                            <CardContent className="flex items-center gap-3">
-                              <div className="w-10 h-10 rounded-lg overflow-hidden bg-accent flex items-center justify-center flex-shrink-0">
-                                {event.plant.photo_url ? (
-                                  <img src={event.plant.photo_url} alt={event.plant.common_name} className="w-full h-full object-cover" />
-                                ) : (
-                                  <Leaf className="size-5 text-primary/40" />
-                                )}
-                              </div>
-                              <div className="flex-1 min-w-0">
-                                <p className="font-medium text-foreground text-sm truncate">
-                                  {event.plant.nickname || event.plant.common_name}
-                                </p>
-                                <p className="text-xs text-muted-foreground flex items-center gap-1">
-                                  <info.Icon className="size-3" /> {info.label}
-                                </p>
-                              </div>
-                              <span className={`text-xs font-medium ${attention ? 'text-attention' : 'text-muted-foreground'} flex-shrink-0`}>
-                                {dayText}
-                              </span>
-                            </CardContent>
-                          </Card>
-                        </Link>
-                      );
-                    })}
-                  </div>
+                  {rows}
                 </div>
               );
             })}
