@@ -1,7 +1,7 @@
 'use client';
 import Link from 'next/link';
 import { useRouter, usePathname } from 'next/navigation';
-import { Leaf } from 'lucide-react';
+import { Leaf, LogOut } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 
@@ -43,8 +43,15 @@ export default function Navigation() {
               {link.label}
             </Link>
           ))}
-          <Button variant="ghost" size="sm" onClick={handleLogout} className="ml-2 text-muted-foreground">
-            Logout
+          <Button
+            variant="ghost"
+            size="icon-sm"
+            onClick={handleLogout}
+            className="ml-2 text-muted-foreground"
+            aria-label="Log out"
+            title="Log out"
+          >
+            <LogOut />
           </Button>
         </div>
       </div>

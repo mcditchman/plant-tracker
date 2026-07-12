@@ -1,30 +1,22 @@
 'use client';
 import { Fragment, useState } from 'react';
 import Link from 'next/link';
-import { Flower2, Leaf, Scissors, type LucideIcon } from 'lucide-react';
 import { UserPlant } from '@/types';
 import { Card, CardContent } from '@/components/ui/card';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import {
+  CELL_ACTIVE,
+  CELL_DORMANT,
+  CELL_INACTIVE,
+  GrowthLegend,
+  MONTH_LABELS,
+  MONTH_ORDER,
+  SEASON_CATEGORIES,
+  getSeasonBands,
+  type SeasonCategory,
+} from '@/components/seasons';
 
-type Category = 'bloom' | 'growth' | 'pruning';
-
-const MONTH_ORDER = [9, 10, 11, 12, 1, 2, 3, 4, 5, 6, 7, 8];
-const MONTH_LABELS = ['Sep', 'Oct', 'Nov', 'Dec', 'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug'];
-
-const NORTHERN_BANDS = [
-  { name: 'Fall', color: 'bg-orange-400/20' },
-  { name: 'Winter', color: 'bg-cyan-400/20' },
-  { name: 'Spring', color: 'bg-green-400/20' },
-  { name: 'Summer', color: 'bg-yellow-400/20' },
-];
-
-const CATEGORIES: { key: Category; label: string; Icon: LucideIcon }[] = [
-  { key: 'bloom', label: 'Bloom', Icon: Flower2 },
-  { key: 'growth', label: 'Growth cycle', Icon: Leaf },
-  { key: 'pruning', label: 'Pruning & repotting', Icon: Scissors },
-];
-
-function plantHasCategory(plant: UserPlant, category: Category): boolean {
+function plantHasCategory(plant: UserPlant, category: SeasonCategory): boolean {
   const events = plant.seasonal_events;
   if (!events) return false;
   if (category === 'bloom') return events.bloom_months.length > 0;
@@ -33,17 +25,18 @@ function plantHasCategory(plant: UserPlant, category: Category): boolean {
 }
 
 export default function SeasonTimelineBoard({ plants }: { plants: UserPlant[] }) {
-  const [category, setCategory] = useState<Category>('bloom');
+  const [category, setCategory] = useState<SeasonCategory>('bloom');
   const currentMonth = new Date().getMonth() + 1;
   const qualifyingPlants = plants.filter(p => plantHasCategory(p, category));
+  const bands = getSeasonBands(null);
 
   return (
     <Card>
       <CardContent>
         <h2 className="font-semibold text-foreground mb-3">Season overview</h2>
-        <Tabs value={category} onValueChange={v => setCategory(v as Category)}>
+        <Tabs value={category} onValueChange={v => setCategory(v as SeasonCategory)}>
           <TabsList className="w-full mb-4">
-            {CATEGORIES.map(c => (
+            {SEASON_CATEGORIES.map(c => (
               <TabsTrigger key={c.key} value={c.key} className="flex-1">
                 <c.Icon className="size-3.5" /> {c.label}
               </TabsTrigger>
@@ -54,7 +47,7 @@ export default function SeasonTimelineBoard({ plants }: { plants: UserPlant[] })
         <div className="grid grid-cols-[100px_1fr] gap-y-1.5 gap-x-2 items-center">
           <div />
           <div className="grid grid-cols-12 gap-px text-center">
-            {NORTHERN_BANDS.map((band, i) => (
+            {bands.map((band, i) => (
               <div key={i} className={`col-span-3 ${band.color} text-foreground/70 text-xs font-medium py-1 rounded-sm`}>
                 {band.name}
               </div>
@@ -89,7 +82,7 @@ export default function SeasonTimelineBoard({ plants }: { plants: UserPlant[] })
                     return (
                       <div
                         key={month}
-                        className={`h-6 rounded-sm ${active ? (isDormant ? 'bg-muted-foreground/25' : 'bg-primary/60') : 'bg-muted/40'}`}
+                        className={`h-6 rounded-sm ${active ? (isDormant ? CELL_DORMANT : CELL_ACTIVE) : CELL_INACTIVE}`}
                       />
                     );
                   })}
@@ -98,6 +91,8 @@ export default function SeasonTimelineBoard({ plants }: { plants: UserPlant[] })
             );
           })}
         </div>
+
+        {category === 'growth' && qualifyingPlants.length > 0 && <GrowthLegend />}
 
         {qualifyingPlants.length === 0 && (
           <p className="text-sm text-muted-foreground mt-3">No plants have data for this category yet — visit a plant&apos;s page to generate it.</p>

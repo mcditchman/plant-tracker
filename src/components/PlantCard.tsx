@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { Droplet, Leaf, MapPin } from 'lucide-react';
 import { UserPlant } from '@/types';
+import QuickCareButton from '@/components/QuickCareButton';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 
@@ -58,19 +59,22 @@ export default function PlantCard({ plant }: { plant: UserPlant }) {
                 </Badge>
               )}
             </div>
-            <div className="mt-2 flex items-center gap-3">
-              <div className={`flex items-center gap-1.5 ${waterStatus.attention ? 'text-attention' : 'text-muted-foreground'}`}>
-                <Droplet className="size-3.5" />
-                <span className="text-sm font-medium">
-                  {waterStatus.label}
-                </span>
+            <div className="mt-2 flex items-center justify-between gap-3">
+              <div className="flex items-center gap-3 min-w-0">
+                <div className={`flex items-center gap-1.5 ${waterStatus.attention ? 'text-attention' : 'text-muted-foreground'}`}>
+                  <Droplet className="size-3.5" />
+                  <span className="text-sm font-medium whitespace-nowrap">
+                    {waterStatus.label}
+                  </span>
+                </div>
+                {plant.location && (
+                  <span className="text-xs text-muted-foreground flex items-center gap-1 truncate">
+                    <MapPin className="size-3 flex-shrink-0" />
+                    {plant.location}
+                  </span>
+                )}
               </div>
-              {plant.location && (
-                <span className="text-xs text-muted-foreground flex items-center gap-1">
-                  <MapPin className="size-3" />
-                  {plant.location}
-                </span>
-              )}
+              {waterStatus.attention && <QuickCareButton plantId={plant.id} action="water" />}
             </div>
           </div>
         </CardContent>
