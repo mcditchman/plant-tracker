@@ -1,6 +1,7 @@
 import { createClient } from '@/lib/supabase/server';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
+import { Droplet, Plus, Sprout } from 'lucide-react';
 import PlantCard from '@/components/PlantCard';
 import SeasonTimelineBoard from '@/components/SeasonTimelineBoard';
 import { UserPlant } from '@/types';
@@ -43,15 +44,16 @@ export default async function HomePage() {
           </p>
         </div>
         <Button render={<Link href="/identify" />} nativeButton={false}>
-          <span>+</span> Add Plant
+          <Plus /> Add Plant
         </Button>
       </div>
 
       {needsWater.length > 0 && (
-        <Card className="bg-blue-50 mb-6">
+        <Card className="mb-6">
           <CardContent>
-            <p className="text-blue-800 font-medium text-sm">
-              💧 {needsWater.length} plant{needsWater.length !== 1 ? 's' : ''} need{needsWater.length === 1 ? 's' : ''} water
+            <p className="text-attention font-medium text-sm flex items-center gap-2">
+              <Droplet className="size-4" />
+              {needsWater.length} plant{needsWater.length !== 1 ? 's' : ''} need{needsWater.length === 1 ? 's' : ''} water
             </p>
           </CardContent>
         </Card>
@@ -61,7 +63,7 @@ export default async function HomePage() {
 
       {plantList.length === 0 ? (
         <div className="text-center py-16">
-          <div className="text-6xl mb-4">🌱</div>
+          <Sprout className="size-12 mx-auto text-primary/50 mb-4" />
           <h2 className="text-xl font-semibold text-foreground mb-2">Add your first plant</h2>
           <p className="text-muted-foreground mb-6 max-w-xs mx-auto">
             Take a photo or search by name and AI will identify your plant and set up a care schedule.

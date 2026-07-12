@@ -1,6 +1,7 @@
 'use client';
 import Link from 'next/link';
 import { useRouter, usePathname } from 'next/navigation';
+import { Leaf } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 
@@ -24,7 +25,7 @@ export default function Navigation() {
     <nav className="bg-card border-b sticky top-0 z-10">
       <div className="max-w-2xl mx-auto px-4 h-14 flex items-center justify-between">
         <Link href="/" className="flex items-center gap-2 font-semibold text-primary text-lg">
-          <span className="text-2xl">🌿</span>
+          <Leaf className="size-5" />
           <span>My Plants</span>
         </Link>
         <div className="flex items-center gap-1">

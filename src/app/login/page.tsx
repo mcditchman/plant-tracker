@@ -1,6 +1,7 @@
 'use client';
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { Leaf } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Input } from '@/components/ui/input';
@@ -51,7 +52,7 @@ export default function LoginPage() {
     <div className="min-h-[80vh] flex items-center justify-center">
       <div className="w-full max-w-sm">
         <div className="text-center mb-8">
-          <div className="text-6xl mb-3">🌿</div>
+          <Leaf className="size-12 mx-auto text-primary mb-3" />
           <h1 className="text-2xl font-bold text-foreground">Plant Tracker</h1>
           <p className="text-muted-foreground mt-1">Care for your plants, one at a time</p>
         </div>

@@ -1,5 +1,6 @@
 'use client';
 import { useState } from 'react';
+import { Flower2, Leaf, Scissors, Snowflake, type LucideIcon } from 'lucide-react';
 import { SeasonalEvents, Hemisphere } from '@/types';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Card, CardContent } from '@/components/ui/card';
@@ -10,27 +11,27 @@ const MONTH_ORDER = [9, 10, 11, 12, 1, 2, 3, 4, 5, 6, 7, 8];
 const MONTH_LABELS = ['Sep', 'Oct', 'Nov', 'Dec', 'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug'];
 
 const NORTHERN_BANDS = [
-  { name: 'Fall', emoji: '🍂', color: 'bg-orange-400' },
-  { name: 'Winter', emoji: '❄️', color: 'bg-cyan-400' },
-  { name: 'Spring', emoji: '🌱', color: 'bg-green-400' },
-  { name: 'Summer', emoji: '☀️', color: 'bg-yellow-400' },
+  { name: 'Fall', color: 'bg-orange-400/20' },
+  { name: 'Winter', color: 'bg-cyan-400/20' },
+  { name: 'Spring', color: 'bg-green-400/20' },
+  { name: 'Summer', color: 'bg-yellow-400/20' },
 ];
 
 const SOUTHERN_BANDS = [
-  { name: 'Spring', emoji: '🌱', color: 'bg-green-400' },
-  { name: 'Summer', emoji: '☀️', color: 'bg-yellow-400' },
-  { name: 'Fall', emoji: '🍂', color: 'bg-orange-400' },
-  { name: 'Winter', emoji: '❄️', color: 'bg-cyan-400' },
+  { name: 'Spring', color: 'bg-green-400/20' },
+  { name: 'Summer', color: 'bg-yellow-400/20' },
+  { name: 'Fall', color: 'bg-orange-400/20' },
+  { name: 'Winter', color: 'bg-cyan-400/20' },
 ];
 
 function getSeasonBands(hemisphere: Hemisphere | null) {
   return hemisphere === 'southern' ? SOUTHERN_BANDS : NORTHERN_BANDS;
 }
 
-const CATEGORIES: { key: Category; label: string; icon: string }[] = [
-  { key: 'bloom', label: 'Bloom', icon: '🌸' },
-  { key: 'growth', label: 'Growth Cycle', icon: '🌿' },
-  { key: 'pruning', label: 'Pruning & Repotting', icon: '✂️' },
+const CATEGORIES: { key: Category; label: string; Icon: LucideIcon }[] = [
+  { key: 'bloom', label: 'Bloom', Icon: Flower2 },
+  { key: 'growth', label: 'Growth Cycle', Icon: Leaf },
+  { key: 'pruning', label: 'Pruning & Repotting', Icon: Scissors },
 ];
 
 const EMPTY_MESSAGES: Record<Category, string> = {
@@ -57,7 +58,9 @@ export default function SeasonTimeline({ events, hemisphere }: { events: Seasona
         <Tabs value={category} onValueChange={v => setCategory(v as Category)}>
           <TabsList className="w-full mb-4">
             {CATEGORIES.map(c => (
-              <TabsTrigger key={c.key} value={c.key} className="flex-1">{c.icon} {c.label}</TabsTrigger>
+              <TabsTrigger key={c.key} value={c.key} className="flex-1">
+                <c.Icon className="size-3.5" /> {c.label}
+              </TabsTrigger>
             ))}
           </TabsList>
         </Tabs>
@@ -68,8 +71,8 @@ export default function SeasonTimeline({ events, hemisphere }: { events: Seasona
           <div>
             <div className="grid grid-cols-12 gap-px text-center">
               {bands.map((band, bandIndex) => (
-                <div key={bandIndex} className={`col-span-3 ${band.color} text-white text-xs font-medium py-1.5 rounded-sm`}>
-                  {band.name} {band.emoji}
+                <div key={bandIndex} className={`col-span-3 ${band.color} text-foreground/70 text-xs font-medium py-1.5 rounded-sm`}>
+                  {band.name}
                 </div>
               ))}
             </div>
@@ -89,10 +92,10 @@ export default function SeasonTimeline({ events, hemisphere }: { events: Seasona
               <div className="grid grid-cols-12 gap-px mt-1">
                 {MONTH_ORDER.map(month => (
                   <div key={month} className="bg-muted/50 rounded-sm py-2 flex items-center justify-center">
-                    {category === 'bloom' && events.bloom_months.includes(month) && <span title="Flowering">🌸</span>}
-                    {category === 'growth' && events.growth_months.includes(month) && <span title="Active growth">🌿</span>}
-                    {category === 'growth' && events.dormancy_months.includes(month) && <span title="Dormant">❄️</span>}
-                    {category === 'pruning' && events.pruning_months.includes(month) && <span title="Best time to prune/repot">✂️</span>}
+                    {category === 'bloom' && events.bloom_months.includes(month) && <Flower2 className="size-3.5 text-primary" aria-label="Flowering" />}
+                    {category === 'growth' && events.growth_months.includes(month) && <Leaf className="size-3.5 text-primary" aria-label="Active growth" />}
+                    {category === 'growth' && events.dormancy_months.includes(month) && <Snowflake className="size-3.5 text-muted-foreground" aria-label="Dormant" />}
+                    {category === 'pruning' && events.pruning_months.includes(month) && <Scissors className="size-3.5 text-primary" aria-label="Best time to prune/repot" />}
                   </div>
                 ))}
               </div>

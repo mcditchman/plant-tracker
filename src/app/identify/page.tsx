@@ -1,6 +1,7 @@
 'use client';
 import { useState, useRef } from 'react';
 import { useRouter } from 'next/navigation';
+import { Camera, Droplet, Droplets, Leaf, Lightbulb, Loader2, PenLine, Sun, Thermometer, X } from 'lucide-react';
 import { PlantIdentification, PlantCandidate } from '@/types';
 import { Card, CardContent } from '@/components/ui/card';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -12,16 +13,10 @@ import { Badge } from '@/components/ui/badge';
 type Step = 'input' | 'loading' | 'candidates' | 'result' | 'adding' | 'done';
 type InputMode = 'photo' | 'search';
 
-const difficultyColors = {
-  easy: 'bg-green-100 text-green-700',
-  moderate: 'bg-yellow-100 text-yellow-700',
-  hard: 'bg-red-100 text-red-700',
-};
-
-const confidenceColors = {
-  high: 'bg-green-100 text-green-700',
-  medium: 'bg-yellow-100 text-yellow-700',
-  low: 'bg-red-100 text-red-700',
+const confidenceLabels = {
+  high: 'Likely match',
+  medium: 'Possible match',
+  low: 'Long shot',
 };
 
 export default function IdentifyPage() {
@@ -186,8 +181,8 @@ export default function IdentifyPage() {
         <div className="space-y-4">
           <Tabs value={mode} onValueChange={v => setMode(v as InputMode)}>
             <TabsList className="w-full">
-              <TabsTrigger value="photo" className="flex-1">📷 Upload Photo</TabsTrigger>
-              <TabsTrigger value="search" className="flex-1">📝 Describe It</TabsTrigger>
+              <TabsTrigger value="photo" className="flex-1"><Camera className="size-3.5" /> Upload Photo</TabsTrigger>
+              <TabsTrigger value="search" className="flex-1"><PenLine className="size-3.5" /> Describe It</TabsTrigger>
             </TabsList>
           </Tabs>
 
@@ -210,7 +205,7 @@ export default function IdentifyPage() {
                     variant="secondary"
                     className="absolute top-3 right-3 rounded-full"
                   >
-                    ✕
+                    <X />
                   </Button>
                 </div>
               ) : (
@@ -218,7 +213,7 @@ export default function IdentifyPage() {
                   onClick={() => fileRef.current?.click()}
                   className="w-full h-48 border-2 border-dashed border-border rounded-2xl flex flex-col items-center justify-center gap-3 hover:border-primary/40 hover:bg-accent transition-colors"
                 >
-                  <span className="text-4xl">📷</span>
+                  <Camera className="size-8 text-muted-foreground" />
                   <div className="text-center">
                     <p className="text-foreground font-medium">Take or upload a photo</p>
                     <p className="text-muted-foreground text-sm">Tap to choose from your camera or gallery</p>
@@ -256,7 +251,7 @@ export default function IdentifyPage() {
 
       {step === 'loading' && (
         <div className="text-center py-16">
-          <div className="text-5xl mb-4 animate-pulse">🔍</div>
+          <Loader2 className="size-8 mx-auto text-muted-foreground animate-spin mb-4" />
           <p className="text-foreground font-medium">Identifying your plant...</p>
           <p className="text-muted-foreground text-sm mt-1">This takes a few seconds</p>
         </div>
@@ -273,7 +268,7 @@ export default function IdentifyPage() {
                     {candidate.photo_url ? (
                       <img src={candidate.photo_url} alt={candidate.common_name} className="w-full h-full object-cover" />
                     ) : (
-                      <span className="text-4xl">🌿</span>
+                      <Leaf className="size-8 text-primary/40" />
                     )}
                   </div>
                   <div className="flex-1 min-w-0">
@@ -282,7 +277,7 @@ export default function IdentifyPage() {
                         <h3 className="font-semibold text-foreground">{candidate.common_name}</h3>
                         <p className="text-xs text-muted-foreground italic">{candidate.scientific_name}</p>
                       </div>
-                      <Badge className={confidenceColors[candidate.confidence]}>{candidate.confidence}</Badge>
+                      <Badge variant="secondary" className="flex-shrink-0">{confidenceLabels[candidate.confidence]}</Badge>
                     </div>
                     <p className="text-sm text-foreground/80 mt-1">{candidate.description}</p>
                   </div>
@@ -323,7 +318,7 @@ export default function IdentifyPage() {
                 </div>
                 <div className="flex gap-2 flex-shrink-0">
                   {result.difficulty && (
-                    <Badge className={difficultyColors[result.difficulty]}>{result.difficulty}</Badge>
+                    <Badge variant="secondary">{result.difficulty}</Badge>
                   )}
                 </div>
               </div>
@@ -361,7 +356,7 @@ export default function IdentifyPage() {
               <div className="space-y-2.5">
                 {result.care.water && (
                   <div className="flex gap-3">
-                    <span className="text-lg w-6 flex-shrink-0">💧</span>
+                    <Droplet className="size-4.5 text-muted-foreground flex-shrink-0" />
                     <div>
                       <p className="text-xs text-muted-foreground font-medium uppercase tracking-wide">Water</p>
                       <p className="text-sm text-foreground/80">{result.care.water}</p>
@@ -370,7 +365,7 @@ export default function IdentifyPage() {
                 )}
                 {result.care.light && (
                   <div className="flex gap-3">
-                    <span className="text-lg w-6 flex-shrink-0">☀️</span>
+                    <Sun className="size-4.5 text-muted-foreground flex-shrink-0" />
                     <div>
                       <p className="text-xs text-muted-foreground font-medium uppercase tracking-wide">Light</p>
                       <p className="text-sm text-foreground/80">{result.care.light}</p>
@@ -379,7 +374,7 @@ export default function IdentifyPage() {
                 )}
                 {result.care.humidity && (
                   <div className="flex gap-3">
-                    <span className="text-lg w-6 flex-shrink-0">🌫️</span>
+                    <Droplets className="size-4.5 text-muted-foreground flex-shrink-0" />
                     <div>
                       <p className="text-xs text-muted-foreground font-medium uppercase tracking-wide">Humidity</p>
                       <p className="text-sm text-foreground/80">{result.care.humidity}</p>
@@ -388,7 +383,7 @@ export default function IdentifyPage() {
                 )}
                 {result.care.temperature && (
                   <div className="flex gap-3">
-                    <span className="text-lg w-6 flex-shrink-0">🌡️</span>
+                    <Thermometer className="size-4.5 text-muted-foreground flex-shrink-0" />
                     <div>
                       <p className="text-xs text-muted-foreground font-medium uppercase tracking-wide">Temperature</p>
                       <p className="text-sm text-foreground/80">{result.care.temperature}</p>
@@ -403,7 +398,9 @@ export default function IdentifyPage() {
           {result.tips && result.tips.length > 0 && (
             <Card className="bg-accent">
               <CardContent>
-                <h3 className="font-semibold text-foreground mb-3">💡 Quick Tips</h3>
+                <h3 className="font-semibold text-foreground mb-3 flex items-center gap-2">
+                  <Lightbulb className="size-4" /> Quick Tips
+                </h3>
                 <ul className="space-y-2">
                   {result.tips.map((tip, i) => (
                     <li key={i} className="text-sm text-foreground/80 flex gap-2">
@@ -467,7 +464,7 @@ export default function IdentifyPage() {
               Try Again
             </Button>
             <Button onClick={handleAddPlant} className="flex-1" size="lg">
-              Add to My Plants 🌱
+              Add to My Plants
             </Button>
           </div>
         </div>
@@ -475,7 +472,7 @@ export default function IdentifyPage() {
 
       {step === 'adding' && (
         <div className="text-center py-16">
-          <div className="text-5xl mb-4 animate-pulse">🌱</div>
+          <Loader2 className="size-8 mx-auto text-muted-foreground animate-spin mb-4" />
           <p className="text-foreground font-medium">Adding to your collection...</p>
         </div>
       )}

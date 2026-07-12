@@ -1,6 +1,7 @@
 'use client';
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { NotebookPen, Scissors, Shovel, SprayCan, Sprout, type LucideIcon } from 'lucide-react';
 import { CareType } from '@/types';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
@@ -15,12 +16,12 @@ import {
   SheetClose,
 } from '@/components/ui/sheet';
 
-const careOptions: { type: CareType; label: string; icon: string }[] = [
-  { type: 'fertilize', label: 'Fertilize', icon: '🌱' },
-  { type: 'prune', label: 'Prune', icon: '✂️' },
-  { type: 'repot', label: 'Repot', icon: '🪴' },
-  { type: 'mist', label: 'Mist', icon: '🌫️' },
-  { type: 'other', label: 'Other', icon: '📝' },
+const careOptions: { type: CareType; label: string; Icon: LucideIcon }[] = [
+  { type: 'fertilize', label: 'Fertilize', Icon: Sprout },
+  { type: 'prune', label: 'Prune', Icon: Scissors },
+  { type: 'repot', label: 'Repot', Icon: Shovel },
+  { type: 'mist', label: 'Mist', Icon: SprayCan },
+  { type: 'other', label: 'Other', Icon: NotebookPen },
 ];
 
 export default function CareLogButton({ plantId }: { plantId: string }) {
@@ -48,8 +49,8 @@ export default function CareLogButton({ plantId }: { plantId: string }) {
 
   return (
     <Sheet open={open} onOpenChange={setOpen}>
-      <SheetTrigger render={<Button size="lg" className="gap-2" />}>
-        <span>✨</span>
+      <SheetTrigger render={<Button size="lg" variant="outline" className="gap-2" />}>
+        <NotebookPen />
         Log Care
       </SheetTrigger>
       <SheetContent side="bottom" showCloseButton={false}>
@@ -66,7 +67,7 @@ export default function CareLogButton({ plantId }: { plantId: string }) {
                 selected === opt.type ? 'border-primary bg-accent' : 'border-border hover:border-muted-foreground/30'
               )}
             >
-              <span className="text-xl">{opt.icon}</span>
+              <opt.Icon className="size-5 text-muted-foreground" />
               <span className="text-xs font-medium text-foreground">{opt.label}</span>
             </button>
           ))}

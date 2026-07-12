@@ -1,6 +1,7 @@
 'use client';
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { Droplet, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 export default function WaterButton({ plantId }: { plantId: string }) {
@@ -22,9 +23,9 @@ export default function WaterButton({ plantId }: { plantId: string }) {
       onClick={handleWater}
       disabled={loading}
       size="lg"
-      className="gap-2 bg-blue-500 hover:bg-blue-600 disabled:bg-blue-300 text-white"
+      className="gap-2"
     >
-      <span>{loading ? '⏳' : '💧'}</span>
+      {loading ? <Loader2 className="animate-spin" /> : <Droplet />}
       {loading ? 'Watering...' : 'Water Now'}
     </Button>
   );
