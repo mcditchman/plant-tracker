@@ -26,7 +26,7 @@ export default function WaterButton({ plantId }: { plantId: string }) {
       className="gap-2"
     >
       {loading ? <Loader2 className="animate-spin" /> : <Droplet />}
-      {loading ? 'Watering...' : 'Water Now'}
+      {loading ? 'Watering...' : 'Water now'}
     </Button>
   );
 }

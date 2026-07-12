@@ -174,15 +174,15 @@ export default function IdentifyPage() {
 
   return (
     <div>
-      <h1 className="text-2xl font-bold text-foreground mb-1">Identify a Plant</h1>
+      <h1 className="text-2xl font-bold text-foreground mb-1">Identify a plant</h1>
       <p className="text-muted-foreground text-sm mb-6">Take a photo or describe it — AI will show you matching options and set up a care schedule</p>
 
       {step === 'input' && (
         <div className="space-y-4">
           <Tabs value={mode} onValueChange={v => setMode(v as InputMode)}>
             <TabsList className="w-full">
-              <TabsTrigger value="photo" className="flex-1"><Camera className="size-3.5" /> Upload Photo</TabsTrigger>
-              <TabsTrigger value="search" className="flex-1"><PenLine className="size-3.5" /> Describe It</TabsTrigger>
+              <TabsTrigger value="photo" className="flex-1"><Camera className="size-3.5" /> Upload photo</TabsTrigger>
+              <TabsTrigger value="search" className="flex-1"><PenLine className="size-3.5" /> Describe it</TabsTrigger>
             </TabsList>
           </Tabs>
 
@@ -244,7 +244,7 @@ export default function IdentifyPage() {
             className="w-full"
             size="lg"
           >
-            {mode === 'photo' ? 'Identify Plant' : 'Find Matches'}
+            {mode === 'photo' ? 'Identify plant' : 'Find matches'}
           </Button>
         </div>
       )}
@@ -296,11 +296,11 @@ export default function IdentifyPage() {
             className="w-full"
             size="lg"
           >
-            Generate Care Guide
+            Generate care guide
           </Button>
 
           <Button onClick={handleReset} variant="outline" className="w-full" size="lg">
-            Start Over
+            Start over
           </Button>
         </div>
       )}
@@ -352,7 +352,7 @@ export default function IdentifyPage() {
           {/* Care overview */}
           <Card>
             <CardContent>
-              <h3 className="font-semibold text-foreground mb-3">Care Requirements</h3>
+              <h3 className="font-semibold text-foreground mb-3">Care requirements</h3>
               <div className="space-y-2.5">
                 {result.care.water && (
                   <div className="flex gap-3">
@@ -399,7 +399,7 @@ export default function IdentifyPage() {
             <Card className="bg-accent">
               <CardContent>
                 <h3 className="font-semibold text-foreground mb-3 flex items-center gap-2">
-                  <Lightbulb className="size-4" /> Quick Tips
+                  <Lightbulb className="size-4" /> Quick tips
                 </h3>
                 <ul className="space-y-2">
                   {result.tips.map((tip, i) => (
@@ -416,7 +416,7 @@ export default function IdentifyPage() {
           {/* Add to collection */}
           <Card>
             <CardContent>
-              <h3 className="font-semibold text-foreground mb-4">Add to My Plants</h3>
+              <h3 className="font-semibold text-foreground mb-4">Add to my plants</h3>
               <div className="space-y-3">
                 <div className="space-y-1">
                   <Label htmlFor="nickname">
@@ -461,10 +461,10 @@ export default function IdentifyPage() {
 
           <div className="flex gap-3">
             <Button onClick={handleReset} variant="outline" className="flex-1" size="lg">
-              Try Again
+              Try again
             </Button>
             <Button onClick={handleAddPlant} className="flex-1" size="lg">
-              Add to My Plants
+              Add plant
             </Button>
           </div>
         </div>

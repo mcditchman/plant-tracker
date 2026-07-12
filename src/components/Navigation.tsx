@@ -8,7 +8,7 @@ import { cn } from '@/lib/utils';
 const links = [
   { href: '/', label: 'Dashboard' },
   { href: '/schedule', label: 'Schedule' },
-  { href: '/identify', label: '+ Add Plant' },
+  { href: '/identify', label: 'Add plant' },
 ];
 
 export default function Navigation() {
@@ -26,7 +26,7 @@ export default function Navigation() {
       <div className="max-w-2xl mx-auto px-4 h-14 flex items-center justify-between">
         <Link href="/" className="flex items-center gap-2 font-semibold text-primary text-lg">
           <Leaf className="size-5" />
-          <span>My Plants</span>
+          <span>Plant Tracker</span>
         </Link>
         <div className="flex items-center gap-1">
           {links.map(link => (
